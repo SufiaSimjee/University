@@ -14,10 +14,10 @@ connectDB();
 
 const app = express();
 
-// CORS configuration to allow only the frontend URL
+// Middleware
 app.use(
   cors({
-    origin: "*", // Replace with your actual frontend URL
+    origin: "*", 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "X-CSRF-Token", 
@@ -26,10 +26,9 @@ app.use(
       "Content-Type", 
       "Authorization"
     ],
-    credentials: true, // Allow cookies to be sent
+    credentials: true, 
   })
 );
-
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -38,12 +37,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/users', userRoutes);
 app.use('/api/departments', departmentRoutes);
 
-// Test route to confirm the API is working
+
 app.get('/', (req, res) => {
   res.send('Welcome to the API!');
 });
 
-// Pusher configuration
+// Pusher configuration for demo
 const pusher = new Pusher({
   appId: '1950378',
   key: 'd515d193601eae0c654b',
@@ -52,14 +51,13 @@ const pusher = new Pusher({
   useTLS: true,
 });
 
-// Example of triggering an event using Pusher
-pusher.trigger('monta-channel', 'mad-monta', {
-  message: 'hello monta',
+pusher.trigger('science-channel', 'my-event', {
+  message: 'hello science department',
 });
 
 // Error handling middleware
 app.use(notFound);
 app.use(errorHandler);
 
-// Export the app for Vercel
+
 export default app;
