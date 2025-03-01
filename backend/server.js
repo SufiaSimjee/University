@@ -22,6 +22,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.get('/', (req, res) => {
+    res.send('Server is running');
+});
 app.use('/api/users', userRoutes);
 app.use('/api/departments', departmentRoutes);
 
