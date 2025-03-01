@@ -17,7 +17,7 @@ const app = express();
 // CORS configuration to allow only the frontend URL
 app.use(
   cors({
-    origin: "https://ewsd-frontend-29pzeuwee-sufias-projects-12d26cf0.vercel.app", // Replace with your actual frontend URL
+    origin: "https://university-frontend-six.vercel.app", // Replace with your actual frontend URL
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "X-CSRF-Token", 
