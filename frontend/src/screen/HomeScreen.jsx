@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../slices/authSlice';
 import { useLogoutMutation } from '../slices/usersApiSlice';
 import { toast } from 'react-toastify';
+import {Button} from 'react-bootstrap'
 
 const HomeScreen = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -27,9 +28,13 @@ const HomeScreen = () => {
       {userInfo ? (
         <div>
           <h2>Welcome {userInfo.name}</h2>
-          <button onClick={logoutHandler}>Logout</button>
+          <Button onClick={logoutHandler}>Logout</Button>
         </div>
-      ) : null}
+      ) : (
+        <> 
+          <Button onClick={() => navigate('/login')}>Login</Button>
+        </>
+      )}
     </>
   );
 };
