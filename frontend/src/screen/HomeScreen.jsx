@@ -1,14 +1,13 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../slices/authSlice';
 import { useLogoutMutation } from '../slices/usersApiSlice';
 import { toast } from 'react-toastify';
-import {Button} from 'react-bootstrap'
+import { Button } from 'react-bootstrap';
 
 const HomeScreen = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [logoutApiCall] = useLogoutMutation();
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -18,7 +17,7 @@ const HomeScreen = () => {
       dispatch(logout());
       navigate('/login');
     } catch (error) {
-      toast.error(error?.data?.message || error.error);
+      toast.error(error?.data?.message || error?.error || 'An error occurred');
     }
   };
 
@@ -32,7 +31,7 @@ const HomeScreen = () => {
         </div>
       ) : (
         <> 
-          <Button onClick={() => navigate('/login')}>Login</Button>
+          <Button as={Link} to='/login'>Login</Button>
         </>
       )}
     </>
