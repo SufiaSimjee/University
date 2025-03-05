@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import userRoutes from './routes/userRoutes.js';
 import departmentRoutes from './routes/departmentRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 import Pusher from 'pusher';
 
 dotenv.config();
@@ -36,6 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/departments', departmentRoutes);
+app.use('/api/categories', categoryRoutes);
 
 
 app.get('/', (req, res) => {

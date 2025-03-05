@@ -155,7 +155,6 @@ const getUsers = asyncHandler(async (req, res) => {
   res.status(200).json(users);
 });
 
-
 export {authUser , 
         registerUser , 
         logoutUser, 

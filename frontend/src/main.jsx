@@ -15,7 +15,7 @@ import HomeScreen from './screen/HomeScreen.jsx'
 import LoginScreen from './screen/LoginScreen.jsx'
 import PrivateRoute from './components/PrivateRoute.jsx'
 import RegisterScreen from './screen/RegisterScreen.jsx'
-import GetAllUser from './screen/GetAllUser.jsx'
+import GetAllUserScreen from './screen/GetAllUserScreen.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,7 +25,7 @@ const router = createBrowserRouter(
         <Route path='/register' element={<RegisterScreen/>}/>
 
         <Route element={<PrivateRoute/>}> 
-          <Route path='/getalluser' element={<GetAllUser/>}/>
+          <Route path='/getalluser' element={<GetAllUserScreen/>}/>
       </Route>
 
     </Route>
