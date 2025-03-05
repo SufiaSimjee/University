@@ -7,7 +7,7 @@ import {
 
 const router = express.Router();
 
-routerter.route('/').get(getAllCategories);
+router.route('/').get(getAllCategories);
 router.route('/create').post(protect, roleAccess(['Admin', 'QA Manager']),  createCategory);
 
 export default router;
