@@ -10,11 +10,11 @@ const ideaSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    category: {
+    category: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
-    },
+    }],
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -30,18 +30,18 @@ const ideaSchema = new mongoose.Schema(
         default: Null
       },
     ],
-    agreetoterms: {
+    agreeToTerms: {
        type: Boolean,
       default: false,
     },
 
-    upvotes: [
+    upVotes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User", 
       },
     ],
-    downvotes: [
+    downVotes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User", 

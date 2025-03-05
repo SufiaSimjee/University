@@ -44,19 +44,6 @@ app.get('/', (req, res) => {
   res.send('Welcome to the API!');
 });
 
-// Pusher configuration for demo
-const pusher = new Pusher({
-  appId: '1950378',
-  key: 'd515d193601eae0c654b',
-  secret: 'dd23b42147e7b02e4f9c',
-  cluster: 'mt1',
-  useTLS: true,
-});
-
-pusher.trigger('science-channel', 'my-event', {
-  message: 'hello science department',
-});
-
 // Error handling middleware
 app.use(notFound);
 app.use(errorHandler);
