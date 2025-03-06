@@ -13,13 +13,14 @@ import './assets/styles/index.css'
 import App from './App.jsx'
 import HomeScreen from './screen/HomeScreen.jsx'
 import LoginScreen from './screen/LoginScreen.jsx'
-import AdminOrQAManagerRoute from './components/AdminOrQAManagerRoute.jsx'
-import PrivateRoute from './components/PrivateRoute.jsx'
 import RegisterScreen from './screen/RegisterScreen.jsx'
+import AdminRegisterScreen from "./screen/AdminRegisterScreen.jsx"
+import QACRegisterScreen from './screen/QACRegisterScreen.jsx'
 // import GetAllUserScreen from './screen/GetAllUserScreen.jsx'
 // import IdeasScreen from './screen/IdeasScreen.jsx'
 // import DepartmentIdeaScreen from './screen/DepartmentIdeaScreen.jsx'
 // import CategoryListScreen from './screen/CategoryListScreen.jsx'
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,6 +28,8 @@ const router = createBrowserRouter(
         <Route path='/' index='true' element={<HomeScreen/>}/>
         <Route path='/login' element={<LoginScreen/>}/>
         <Route path='/register' element={<RegisterScreen/>}/>
+        <Route path='/adminregister' element={<AdminRegisterScreen/>}/>
+        <Route path='/qacregister' element={<QACRegisterScreen/>}/>
 
         {/* <Route element={<AdminOrQAManagerRoute/>}> 
           <Route path='/getalluser' element={<GetAllUserScreen/>}/>

@@ -6,7 +6,7 @@ import { Outlet } from "react-router-dom"
 const App = () => {
   return (
     <>
-      <main className="py-3">
+      <main className="py-3" >
         <Container>
         <Outlet/>
      </Container>

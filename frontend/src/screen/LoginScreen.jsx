@@ -40,7 +40,11 @@ const LoginScreen = () => {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100">
+    <>
+     <div className="text-center mb-4 mt-5">
+        <h1>University Innovation & Improvement Hub</h1>
+        <p>Empowering Staff Ideas for a Better Future</p>
+      </div>
     <FormContainer >
       <h1>Sign In to Your Account</h1>
 
@@ -66,7 +70,7 @@ const LoginScreen = () => {
         </Form.Group>
         
         <Col className="d-grid gap-2">
-        <Button type="submit" variant="primary" className="mt-2 roundded-0"
+        <Button type="submit" variant="info" className="mt-2 text-white roundded-25"
         disabled={isLoading}>
           Sign In
         </Button>
@@ -77,15 +81,15 @@ const LoginScreen = () => {
 
       <Row className="py-3">
       <Col>
-           New Here ? Create An  Account 
+           New Here?
            <Link to={redirect ? `/register?redirect=${redirect}` : '/register'}>
-              Register
+              Create An account
            </Link>
       </Col>
 
       </Row>
     </FormContainer>
-    </div>
+  </>
   );
 };
 

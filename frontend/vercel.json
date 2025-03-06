@@ -1,6 +1,8 @@
 {
     "routes": [
       { "src": "/login", "dest": "/" },
-      { "src": "/register", "dest": "/" }
+      { "src": "/register", "dest": "/" },
+      { "src": "/adminregister", "dest": "/" },
+      {"src" : "/qacregister" , "dest": "/"}
     ]
 }

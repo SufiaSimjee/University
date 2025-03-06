@@ -9,12 +9,13 @@ import { setCredentials } from "../slices/authSlice";
 import { toast } from 'react-toastify';
 import { useGetAllDepartmentsQuery } from "../slices/departmentApiSlice"; 
 
-const RegisterScreen = () => {
+const AdminRegisterScreen = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedDepartments, setSelectedDepartments] = useState([]); 
+  const [selectedDepartments, setSelectedDepartments] = useState([]);
+  const [role, setRole] = useState("Staff"); // Add role state
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ const RegisterScreen = () => {
   const sp = new URLSearchParams(search);
   const redirect = sp.get('redirect') || '/';
 
-   // Fetch departments 
+  // Fetch departments
   const { data: departments, isLoading: departmentsLoading, error } = useGetAllDepartmentsQuery();
 
   useEffect(() => {
@@ -45,7 +46,7 @@ const RegisterScreen = () => {
     }
 
     try {
-      const res = await register({ fullName, email, password, departments: selectedDepartments }).unwrap();
+      const res = await register({ fullName, email, password, role, departments: selectedDepartments }).unwrap();
       dispatch(setCredentials({ ...res }));
       toast.success('Registration successful');
       navigate(redirect);
@@ -56,14 +57,13 @@ const RegisterScreen = () => {
 
   return (
     <>
-  
       <div className="text-center mb-4 mt-5">
         <h1>University Innovation & Improvement Hub</h1>
         <p>Empowering Staff Ideas for a Better Future</p>
       </div>
-
     <FormContainer>
-      <h1>Sign In to Your Account (Staff) </h1>
+      <h1>Register for (Admin and QA Manager)</h1>
+      <h3>Admin and QA Manager can register everybody</h3>
 
       <Form onSubmit={submitHandler}>
         {/* Full Name Input */}
@@ -110,33 +110,48 @@ const RegisterScreen = () => {
           />
         </Form.Group>
 
+        {/* Role Selection */}
+        <Form.Group controlId="role" className="my-3">
+          <Form.Label>Role</Form.Label>
+          <Form.Control
+            as="select"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="Staff">Staff</option>
+            <option value="QA Manager">QA Manager</option>
+            <option value="QA Coordinator">QA Coordinator</option>
+            <option value="Admin">Admin</option>
+          </Form.Control>
+        </Form.Group>
 
+        {/* Department Selection */}
         <Form.Group controlId="departments" className="my-3">
-         <Form.Label>Departments</Form.Label>
+          <Form.Label>Departments</Form.Label>
           {departmentsLoading ? (
-         <Loader />
-        ) : error ? (
-       <div>Error loading departments</div>
-      ) : (
-       <Form.Control
-        as="select"
-        multiple
-        value={selectedDepartments}
-        onChange={(e) => {
-        const selectedValues = [...e.target.selectedOptions].map(o => o.value);
-        setSelectedDepartments(selectedValues);
-      }}
-       >
-      {departments?.map((department) => (
-        <option key={department._id} value={department._id}>
-          {department.name}
-        </option>
-      ))}
-    </Form.Control>
-  )}
-   </Form.Group>
+            <Loader />
+          ) : error ? (
+            <div>Error loading departments</div>
+          ) : (
+            <Form.Control
+              as="select"
+              multiple
+              value={selectedDepartments}
+              onChange={(e) => {
+                const selectedValues = [...e.target.selectedOptions].map(o => o.value);
+                setSelectedDepartments(selectedValues);
+              }}
+            >
+              {departments?.map((department) => (
+                <option key={department._id} value={department._id}>
+                  {department.name}
+                </option>
+              ))}
+            </Form.Control>
+          )}
+        </Form.Group>
 
-
+       
       <Col className="d-grid gap-2">
         <Button type="submit" variant="info" className="mt-2 roundded-0 text-white"
         disabled={isLoading}>
@@ -149,9 +164,9 @@ const RegisterScreen = () => {
 
       <Row className="py-3">
         <Col>
-          Already have an account?{" "}
+          Already a user?{" "}
           <Link to={redirect ? `/login?redirect=${redirect}` : '/login'}>
-            Sign In
+            Login
           </Link>
         </Col>
       </Row>
@@ -160,4 +175,4 @@ const RegisterScreen = () => {
   );
 };
 
-export default RegisterScreen;
+export default AdminRegisterScreen;

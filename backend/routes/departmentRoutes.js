@@ -12,7 +12,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(protect, roleAccess(['Admin', 'QA Manager']), getAllDepartments);
+  .get( getAllDepartments);
 router
   .route('/create')
   .post(protect, roleAccess(['Admin', 'QA Manager']), createDepartment);
