@@ -31,7 +31,7 @@ const router = createBrowserRouter(
         <Route path='/login' element={<LoginScreen/>}/>
         <Route path='/register' element={<RegisterScreen/>}/>
         <Route path='/admin/register' element={<AdminRegisterScreen/>}/>
-        <Route path='/QAC/registe' element={<QACRegisterScreen/>}/>
+        <Route path='/QAC/register' element={<QACRegisterScreen/>}/>
 
         <Route element={<AdminOrQAManagerRoute/>}> 
           <Route path='/getalluser' element={<GetAllUserScreen/>}/>
