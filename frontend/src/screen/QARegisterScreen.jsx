@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import { useGetAllRolesQuery } from "../slices/roleApiSlice";
 import { useGetAllDepartmentsQuery } from "../slices/departmentApiSlice"; 
 
-const AdminRegisterScreen = () => {
+const QARegisterScreen = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,7 +59,7 @@ const AdminRegisterScreen = () => {
     }
   };
   
-  const filteredRoles = roles?.filter(role =>  role.name === "Staff");
+  const filteredRoles = roles?.filter(role => role.name === "QA Coordinator" || role.name === "Staff" );
 
   return (
     <>
@@ -187,4 +187,4 @@ const AdminRegisterScreen = () => {
   );
 };
 
-export default AdminRegisterScreen;
+export default QARegisterScreen;

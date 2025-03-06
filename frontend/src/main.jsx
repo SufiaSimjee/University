@@ -15,6 +15,7 @@ import HomeScreen from './screen/HomeScreen.jsx'
 import LoginScreen from './screen/LoginScreen.jsx'
 import RegisterScreen from './screen/RegisterScreen.jsx'
 import AdminRegisterScreen from "./screen/AdminRegisterScreen.jsx"
+import QARegisterScreen from './screen/QARegisterScreen.jsx'
 import QACRegisterScreen from './screen/QACRegisterScreen.jsx'
 import GetAllUserScreen from './screen/GetAllUserScreen.jsx'
 import AdminOrQAManagerRoute from './components/AdminOrQAManagerRoute.jsx'
@@ -31,6 +32,7 @@ const router = createBrowserRouter(
         <Route path='/login' element={<LoginScreen/>}/>
         <Route path='/register' element={<RegisterScreen/>}/>
         <Route path='/admin/register' element={<AdminRegisterScreen/>}/>
+        <Route path='/QA/register' element={<QARegisterScreen/>}/>
         <Route path='/QAC/register' element={<QACRegisterScreen/>}/>
 
         <Route element={<AdminOrQAManagerRoute/>}> 

@@ -3,6 +3,7 @@
       { "src": "/login", "dest": "/" },
       { "src": "/register", "dest": "/" },
       { "src": "/admin/register", "dest": "/" },
-      {"src" : "/QAC/register" , "dest": "/"}
+      {"src" : "/QAC/register" , "dest": "/"},
+      {"src" : "/QA/register" , "dest" : "/"}
     ]
 }

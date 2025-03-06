@@ -65,8 +65,8 @@ const AdminRegisterScreen = () => {
         <p>Empowering Staff Ideas for a Better Future</p>
       </div>
     <FormContainer>
-      <h1>Register for (Admin and QA Manager)</h1>
-      <h3>Admin and QA Manager can register everybody</h3>
+      <h1>Register for (Admin)</h1>
+      <h3>Admin can register everybody</h3>
 
       <Form onSubmit={submitHandler}>
         {/* Full Name Input */}
