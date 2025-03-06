@@ -42,6 +42,70 @@ const authUser = asyncHandler(async (req, res) => {
 // @desc    Register a new user
 // @route   POST /api/users
 // @access  Public
+// const registerUser = asyncHandler(async (req, res) => {
+//   const { fullName, email, password, role, departments } = req.body;
+
+//   const userExists = await User.findOne({ email })
+//     .populate('departments', 'name')
+//     .populate('role', 'name');
+
+//   if (userExists) {
+//     res.status(400);
+//     throw new Error('User already exists');
+//   }
+
+//   const qaRole = await Role.findOne({ name: 'QA Coordinator' });
+
+//   if (role === qaRole._id.toString() && departments && departments.length > 0) {
+//     const existingQA = await User.findOne({
+//       role: qaRole._id, 
+//       departments: { $in: departments },
+//     }).populate('departments', 'name')
+//       .populate('role', 'name');
+
+//     if (existingQA) {
+//       res.status(400);
+//       throw new Error(`The department ${existingQA.departments[0].name} already has a QA Coordinator.`);
+//     }
+//   }
+
+ 
+//   const user = await User.create({
+//     fullName,
+//     email,
+//     password,
+//     role: role, 
+//     isActive: true,
+//     departments: departments || [],
+//   });
+
+//   const populatedUser = await User.findById(user._id)
+//     .populate('departments', 'name')
+//     .populate('role', 'name'); 
+
+//   if (populatedUser) {
+//     generateToken(res, user._id);
+
+//     res.status(200).json({
+//       _id: populatedUser._id,
+//       fullName: populatedUser.fullName,
+//       email: populatedUser.email,
+//       role: {
+//         id: populatedUser.role._id,
+//         name: populatedUser.role.name,
+//       },
+//       isActive: populatedUser.isActive,
+//       departments: populatedUser.departments.map(department => ({
+//         id: department._id,
+//         name: department.name,
+//       })),
+//     });
+//   } else {
+//     res.status(400);
+//     throw new Error('Invalid user data');
+//   }
+// });
+
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, password, role, departments } = req.body;
 
@@ -54,11 +118,22 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('User already exists');
   }
 
-  const qaRole = await Role.findOne({ name: 'QA Coordinator' });
+  // Find the 'Staff' role if role is not provided
+  let defaultRole;
+  if (!role) {
+    defaultRole = await Role.findOne({ name: 'Staff' });
+    if (!defaultRole) {
+      res.status(400);
+      throw new Error('Default role "Staff" not found');
+    }
+  } else {
+    defaultRole = await Role.findById(role);
+  }
 
-  if (role === qaRole._id.toString() && departments && departments.length > 0) {
+  // QA Coordinator role validation
+  if (role === defaultRole._id.toString() && departments && departments.length > 0) {
     const existingQA = await User.findOne({
-      role: qaRole._id, 
+      role: defaultRole._id, 
       departments: { $in: departments },
     }).populate('departments', 'name')
       .populate('role', 'name');
@@ -69,12 +144,12 @@ const registerUser = asyncHandler(async (req, res) => {
     }
   }
 
- 
+  // Create new user with the resolved role
   const user = await User.create({
     fullName,
     email,
     password,
-    role: role, 
+    role: defaultRole._id,  
     isActive: true,
     departments: departments || [],
   });
