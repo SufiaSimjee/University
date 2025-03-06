@@ -69,7 +69,7 @@ const AdminRegisterScreen = () => {
       </div>
     <FormContainer>
       <h1>Register for (QA Coordinator)</h1>
-      <h3>QA Coordinatort staff</h3>
+      <h3>QA Coordinatort can register staff only</h3>
 
       <Form onSubmit={submitHandler}>
         {/* Full Name Input */}
