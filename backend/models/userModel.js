@@ -16,12 +16,18 @@ const userSchema = new mongoose.Schema(
         type: String,
         required: true
       },
-      role: {
-        type: String,
-        enum: ['Staff', 'QA Manager', 'QA Coordinator', 'Admin'],
-        default: 'Staff'
-      },
+      // role: {
+      //   type: String,
+      //   enum: ['Staff', 'QA Manager', 'QA Coordinator', 'Admin'],
+      //   default: 'Staff'
+      // },
 
+      role: 
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Role', 
+        },
+      
       departments: [
         {
           type: mongoose.Schema.Types.ObjectId,

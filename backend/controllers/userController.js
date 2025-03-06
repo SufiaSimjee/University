@@ -1,5 +1,6 @@
 import  User  from "../models/userModel.js";
 import Department from '../models/departmentModel.js';
+import Role from '../models/roleModel.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import generateToken from '../utils/generateToken.js';
 
@@ -9,7 +10,9 @@ import generateToken from '../utils/generateToken.js';
 const authUser = asyncHandler(async (req, res) => {
 
     const {email , password} = req.body;
-    const user = await User.findOne({ email }).populate('departments', 'name');
+    const user = await User.findOne({ email })
+      .populate('departments', 'name')
+      .populate('role', 'name');
 
     if(user && await user.matchPassword(password)) {
         
@@ -20,7 +23,10 @@ const authUser = asyncHandler(async (req, res) => {
           _id : user._id,
           fullName : user.fullName,
           email: user.email,
-          role :user.role,
+          role: {
+            id: user.role._id,  
+            name: user.role.name 
+          },
           isActive :user.isActive,
           departments: user.departments.map(department => ({
             id: department._id,
@@ -39,17 +45,23 @@ const authUser = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, password, role, departments } = req.body;
 
-  const userExists = await User.findOne({ email }).populate('departments', 'name');
+  const userExists = await User.findOne({ email })
+    .populate('departments', 'name')
+    .populate('role', 'name');
+
   if (userExists) {
     res.status(400);
     throw new Error('User already exists');
   }
 
-  if (role === 'QA Coordinator' && departments && departments.length > 0) {
+  const qaRole = await Role.findOne({ name: 'QA Coordinator' });
+
+  if (role === qaRole._id.toString() && departments && departments.length > 0) {
     const existingQA = await User.findOne({
-      role: 'QA Coordinator',
-      departments: { $in: departments }, 
-    }).populate('departments', 'name');
+      role: qaRole._id, 
+      departments: { $in: departments },
+    }).populate('departments', 'name')
+      .populate('role', 'name');
 
     if (existingQA) {
       res.status(400);
@@ -57,16 +69,19 @@ const registerUser = asyncHandler(async (req, res) => {
     }
   }
 
+ 
   const user = await User.create({
     fullName,
     email,
-    password,  
-    role: role || 'Staff',
+    password,
+    role: role, 
     isActive: true,
     departments: departments || [],
   });
 
-  const populatedUser = await User.findById(user._id).populate('departments', 'name');
+  const populatedUser = await User.findById(user._id)
+    .populate('departments', 'name')
+    .populate('role', 'name'); 
 
   if (populatedUser) {
     generateToken(res, user._id);
@@ -75,11 +90,14 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: populatedUser._id,
       fullName: populatedUser.fullName,
       email: populatedUser.email,
-      role: populatedUser.role,
+      role: {
+        id: populatedUser.role._id,
+        name: populatedUser.role.name,
+      },
       isActive: populatedUser.isActive,
       departments: populatedUser.departments.map(department => ({
         id: department._id,
-        name: department.name,  
+        name: department.name,
       })),
     });
   } else {

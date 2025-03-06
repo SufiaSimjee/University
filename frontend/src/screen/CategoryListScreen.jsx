@@ -1,8 +1,12 @@
 
 
+
+
 const CategoryListScreen = () => {
   return (
-    <div>CategoryListScreen</div>
+    <>
+   <h1>Category</h1>
+    </>
   )
 }
 

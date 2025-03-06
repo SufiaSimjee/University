@@ -2,7 +2,7 @@
     "routes": [
       { "src": "/login", "dest": "/" },
       { "src": "/register", "dest": "/" },
-      { "src": "/adminregister", "dest": "/" },
-      {"src" : "/qacregister" , "dest": "/"}
+      { "src": "/admin/register", "dest": "/" },
+      {"src" : "/QAC/register" , "dest": "/"}
     ]
 }

@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import userRoutes from './routes/userRoutes.js';
 import departmentRoutes from './routes/departmentRoutes.js';
+import roleRoutes from './routes/roleRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import Pusher from 'pusher';
 
@@ -35,6 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use('/api/roles', roleRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/categories', categoryRoutes);

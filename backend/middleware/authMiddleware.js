@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import asyncHandler from './asyncHandler.js';
 import User from '../models/userModel.js';
+import Role from "../models/roleModel.js";
 
 // Protect routes middleware
 const protect = asyncHandler(async (req, res, next) => {
@@ -21,17 +22,22 @@ const protect = asyncHandler(async (req, res, next) => {
 });
 
 // Role-based Access Middleware
-const roleAccess = (roles = []) => {
-   return async (req, res, next) => {
-     if (!req.user) {
-       return next(new Error('Not authorized, no user found'));
-     }
+const roleAccess = (roles) => {
+  return asyncHandler(async (req, res, next) => {
+    const user = req.user;
 
-     if (roles.length && !roles.includes(req.user.role)) {
-       return next(new Error('Not authorized for this role'));
-     }
-     next();
-   };
- };
+    if (!user) {
+      return next(new Error('Not authorized, user not found'));
+    }
+
+    await user.populate('role', 'name'); 
+
+    if (!roles.includes(user.role.name)) {
+      return next(new Error('Not authorized, insufficient role'));
+    }
+
+    next();
+  });
+};
  
 export { protect, roleAccess };

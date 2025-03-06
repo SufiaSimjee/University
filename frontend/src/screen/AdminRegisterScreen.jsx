@@ -7,6 +7,7 @@ import Loader from "../components/Loader";
 import { useRegisterMutation } from "../slices/usersApiSlice";
 import { setCredentials } from "../slices/authSlice";
 import { toast } from 'react-toastify';
+import { useGetAllRolesQuery } from "../slices/roleApiSlice";
 import { useGetAllDepartmentsQuery } from "../slices/departmentApiSlice"; 
 
 const AdminRegisterScreen = () => {
@@ -15,12 +16,14 @@ const AdminRegisterScreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [selectedDepartments, setSelectedDepartments] = useState([]);
-  const [role, setRole] = useState("Staff"); // Add role state
+  const [role, setRole] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { userInfo } = useSelector((state) => state.auth);
+
+  const { data: roles, isLoading: rolesLoading, error: rolesError } = useGetAllRolesQuery();
 
   const [register, { isLoading }] = useRegisterMutation();
 
@@ -113,16 +116,24 @@ const AdminRegisterScreen = () => {
         {/* Role Selection */}
         <Form.Group controlId="role" className="my-3">
           <Form.Label>Role</Form.Label>
-          <Form.Control
-            as="select"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="Staff">Staff</option>
-            <option value="QA Manager">QA Manager</option>
-            <option value="QA Coordinator">QA Coordinator</option>
-            <option value="Admin">Admin</option>
-          </Form.Control>
+          {rolesLoading ? (
+            <Loader />
+          ) : rolesError ? (
+            <div>Error loading roles</div>
+          ) : (
+            <Form.Control
+              as="select"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="">Select Role</option>
+              {roles?.map((role) => (
+                <option key={role._id} value={role._id}>
+                  {role.name}
+                </option>
+              ))}
+            </Form.Control>
+          )}
         </Form.Group>
 
         {/* Department Selection */}

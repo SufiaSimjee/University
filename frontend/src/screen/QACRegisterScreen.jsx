@@ -7,15 +7,16 @@ import Loader from "../components/Loader";
 import { useRegisterMutation } from "../slices/usersApiSlice";
 import { setCredentials } from "../slices/authSlice";
 import { toast } from 'react-toastify';
+import { useGetAllRolesQuery } from "../slices/roleApiSlice";
 import { useGetAllDepartmentsQuery } from "../slices/departmentApiSlice"; 
 
-const QACRegisterScreen = () => {
+const AdminRegisterScreen = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [selectedDepartments, setSelectedDepartments] = useState([]);
-  const [role, setRole] = useState("Staff"); // Add role state
+  const [role, setRole] = useState(""); 
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -28,7 +29,10 @@ const QACRegisterScreen = () => {
   const sp = new URLSearchParams(search);
   const redirect = sp.get('redirect') || '/';
 
-  // Fetch departments
+  
+  const { data: roles, isLoading: rolesLoading, error: rolesError } = useGetAllRolesQuery();
+  
+
   const { data: departments, isLoading: departmentsLoading, error } = useGetAllDepartmentsQuery();
 
   useEffect(() => {
@@ -54,6 +58,8 @@ const QACRegisterScreen = () => {
       toast.error(error?.data?.message || error?.error);
     }
   };
+  
+  const filteredRoles = roles?.filter(role => role.name === "QA Coordinator" || role.name === "Staff");
 
   return (
     <>
@@ -61,10 +67,9 @@ const QACRegisterScreen = () => {
         <h1>University Innovation & Improvement Hub</h1>
         <p>Empowering Staff Ideas for a Better Future</p>
       </div>
-   
     <FormContainer>
       <h1>Register for (QA Coordinator)</h1>
-      <h3>QA Coordinator can register himself and his departments staff</h3>
+      <h3>QA Coordinatort can register himself and staff</h3>
 
       <Form onSubmit={submitHandler}>
         {/* Full Name Input */}
@@ -114,14 +119,24 @@ const QACRegisterScreen = () => {
         {/* Role Selection */}
         <Form.Group controlId="role" className="my-3">
           <Form.Label>Role</Form.Label>
-          <Form.Control
-            as="select"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="Staff">Staff</option>
-            <option value="QA Coordinator">QA Coordinator</option>
-          </Form.Control>
+          {rolesLoading ? (
+            <Loader />
+          ) : rolesError ? (
+            <div>Error loading roles</div>
+          ) : (
+            <Form.Control
+              as="select"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="">Select Role</option>
+              {filteredRoles?.map((role) => (
+                <option key={role._id} value={role._id}>
+                  {role.name}
+                </option>
+              ))}
+            </Form.Control>
+          )}
         </Form.Group>
 
         {/* Department Selection */}
@@ -151,12 +166,11 @@ const QACRegisterScreen = () => {
         </Form.Group>
 
         <Col className="d-grid gap-2">
-        <Button type="submit" variant="info" className="mt-2 roundded-0 text-white"
-        disabled={isLoading}>
-         Register
-        </Button>
+          <Button type="submit" variant="info" className="mt-2 rounded-0 text-white" disabled={isLoading}>
+            Register
+          </Button>
         </Col>
-        
+
         {isLoading && <Loader />}
       </Form>
 
@@ -173,4 +187,4 @@ const QACRegisterScreen = () => {
   );
 };
 
-export default QACRegisterScreen;
+export default AdminRegisterScreen;
