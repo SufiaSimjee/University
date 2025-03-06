@@ -44,6 +44,10 @@ app.get('/', (req, res) => {
   res.send('Welcome to the API!');
 });
 
+app.listen(7000, () => {
+  console.log('Server is running on port 7000');
+});
+
 // Error handling middleware
 app.use(notFound);
 app.use(errorHandler);

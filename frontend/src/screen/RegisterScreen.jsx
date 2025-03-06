@@ -7,7 +7,7 @@ import Loader from "../components/Loader";
 import { useRegisterMutation } from "../slices/usersApiSlice";
 import { setCredentials } from "../slices/authSlice";
 import { toast } from 'react-toastify';
-import { useGetDepartmentsQuery } from "../slices/departmentApiSlice.js"; 
+import { useGetAllDepartmentsQuery } from "../slices/departmentApiSlice"; 
 
 const RegisterScreen = () => {
   const [fullName, setFullName] = useState("");
@@ -28,7 +28,7 @@ const RegisterScreen = () => {
   const redirect = sp.get('redirect') || '/';
 
    // Fetch departments 
-  const { data: departments, isLoading: departmentsLoading, error } = useGetDepartmentsQuery();
+  const { data: departments, isLoading: departmentsLoading, error } = useGetAllDepartmentsQuery();
 
   useEffect(() => {
     if (userInfo) {

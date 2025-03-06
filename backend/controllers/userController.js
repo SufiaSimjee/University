@@ -9,7 +9,7 @@ import generateToken from '../utils/generateToken.js';
 const authUser = asyncHandler(async (req, res) => {
 
     const {email , password} = req.body;
-    const user = await User.findOne({email});
+    const user = await User.findOne({ email }).populate('departments', 'name');
 
     if(user && await user.matchPassword(password)) {
         
@@ -18,11 +18,14 @@ const authUser = asyncHandler(async (req, res) => {
 
         res.status(200).json({
           _id : user._id,
-          fullName : user.fullname,
+          fullName : user.fullName,
           email: user.email,
           role :user.role,
           isActive :user.isActive,
-          departments : user.departments
+          departments: user.departments.map(department => ({
+            id: department._id,
+            name: department.name,
+          })),
         });
     } else {
       res.status(401);
@@ -36,8 +39,7 @@ const authUser = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, password, role, departments } = req.body;
 
-  const userExists = await User.findOne({ email });
-
+  const userExists = await User.findOne({ email }).populate('departments', 'name');
   if (userExists) {
     res.status(400);
     throw new Error('User already exists');
@@ -47,7 +49,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const existingQA = await User.findOne({
       role: 'QA Coordinator',
       departments: { $in: departments }, 
-    }).populate('departments', 'name'); 
+    }).populate('departments', 'name');
 
     if (existingQA) {
       res.status(400);
@@ -58,27 +60,34 @@ const registerUser = asyncHandler(async (req, res) => {
   const user = await User.create({
     fullName,
     email,
-    password,
+    password,  
     role: role || 'Staff',
-    departments: departments || [],  
+    isActive: true,
+    departments: departments || [],
   });
 
-  if (user) {
+  const populatedUser = await User.findById(user._id).populate('departments', 'name');
+
+  if (populatedUser) {
     generateToken(res, user._id);
 
-    res.status(201).json({
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      departments: user.departments,
+    res.status(200).json({
+      _id: populatedUser._id,
+      fullName: populatedUser.fullName,
+      email: populatedUser.email,
+      role: populatedUser.role,
+      isActive: populatedUser.isActive,
+      departments: populatedUser.departments.map(department => ({
+        id: department._id,
+        name: department.name,  
+      })),
     });
   } else {
     res.status(400);
     throw new Error('Invalid user data');
   }
 });
+
 
 // @desc    Logout user / clear cookie
 // @route   POST /api/users/logout
@@ -105,6 +114,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       _id : user._id,
       fullName : user.fullName,
       email: user.email,
+      role: user.role,
       departments: user.departments,
     });
   } else {
@@ -160,4 +170,5 @@ export {authUser ,
         logoutUser, 
         getUsers , 
         getUserProfile ,
-        updateUserProfile};
+        updateUserProfile
+      };

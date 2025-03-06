@@ -7,16 +7,15 @@ const categorySchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    department: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Department',
-        required: true,
-      },
-    ],
     description: {
       type: String,
     },
+    departments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Department',
+      },
+    ],
   },
   {
     timestamps: true,

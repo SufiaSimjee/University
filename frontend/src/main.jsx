@@ -13,9 +13,13 @@ import './assets/styles/index.css'
 import App from './App.jsx'
 import HomeScreen from './screen/HomeScreen.jsx'
 import LoginScreen from './screen/LoginScreen.jsx'
+import AdminOrQAManagerRoute from './components/AdminOrQAManagerRoute.jsx'
 import PrivateRoute from './components/PrivateRoute.jsx'
 import RegisterScreen from './screen/RegisterScreen.jsx'
-import GetAllUserScreen from './screen/GetAllUserScreen.jsx'
+// import GetAllUserScreen from './screen/GetAllUserScreen.jsx'
+// import IdeasScreen from './screen/IdeasScreen.jsx'
+// import DepartmentIdeaScreen from './screen/DepartmentIdeaScreen.jsx'
+// import CategoryListScreen from './screen/CategoryListScreen.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,9 +28,14 @@ const router = createBrowserRouter(
         <Route path='/login' element={<LoginScreen/>}/>
         <Route path='/register' element={<RegisterScreen/>}/>
 
-        <Route element={<PrivateRoute/>}> 
+        {/* <Route element={<AdminOrQAManagerRoute/>}> 
           <Route path='/getalluser' element={<GetAllUserScreen/>}/>
+          <Route path='/categories' element={<CategoryListScreen/>}/>
       </Route>
+      <Route element={<PrivateRoute/>}>
+        <Route path='/ideas' element={<IdeasScreen/>}/>
+        <Route path="/department/:id/ideas" element={<DepartmentIdeaScreen />} />
+      </Route> */}
 
     </Route>
 

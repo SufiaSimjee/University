@@ -9,14 +9,7 @@ const departmentSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
     },
-    categories: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category",
-      },
-    ],
   },
   {
     timestamps: true,
