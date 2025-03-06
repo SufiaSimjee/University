@@ -69,7 +69,7 @@ const QARegisterScreen = () => {
       </div>
     <FormContainer>
       <h1>Register for (QA Manager)</h1>
-      <h3>QA Manager can register himself and QA Coordinator and Staff</h3>
+      <h3>QA Manager can register QA Coordinator and Staff</h3>
 
       <Form onSubmit={submitHandler}>
         {/* Full Name Input */}
