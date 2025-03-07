@@ -4,6 +4,8 @@
       { "src": "/register", "dest": "/" },
       { "src": "/admin/register", "dest": "/" },
       {"src" : "/QAC/register" , "dest": "/"},
-      {"src" : "/QA/register" , "dest" : "/"}
+      {"src" : "/QA/register" , "dest" : "/"},
+      {"src" : "/getalluser" , "dest" : "/"},
+      {"src" : "/categories" , "dest" : "/"},
     ]
 }
