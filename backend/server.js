@@ -28,8 +28,6 @@ const allowCors = fn => async (req, res) => {
     res.status(200).end();
     return;
   }
-
-  
   return await fn(req, res);
 };
 
@@ -38,15 +36,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-const allowedOrigin = '*'; 
-app.use(cors({
-  origin: allowedOrigin,     
-  credentials: true,          
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
-  allowedHeaders: ['X-CSRF-Token', 'X-Requested-With', 'Accept', 'Content-Type', 'Authorization'] 
-}));
-
+app.use(allowCors);
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
