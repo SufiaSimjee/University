@@ -10,7 +10,7 @@ const generateToken = (res, userId) => {
     res.cookie('jwt', token, {
       httpOnly: true, 
       secure: process.env.NODE_ENV === 'production', 
-      sameSite: 'None', 
+      sameSite: 'none', 
       domain: process.env.NODE_ENV === 'production' ? 'university-red.vercel.app' : 'localhost', 
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/', 
