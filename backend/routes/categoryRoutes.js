@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 
-router.route('/').get(protect, roleAccess(['Admin']), getAllCategories);
+router.route('/').get( protect , getAllCategories);
 router.route('/create').post(protect, roleAccess(['Admin', 'QA Manager']), createCategory);
 router.route('/:id').delete(protect, roleAccess(['Admin', 'QA Manager']), deleteCategory)
       .put(protect, roleAccess(['Admin', 'QA Manager']), updateCategory)

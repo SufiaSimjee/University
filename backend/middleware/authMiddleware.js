@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken';
 import asyncHandler from './asyncHandler.js';
 import User from '../models/userModel.js';
-import Role from "../models/roleModel.js";
 
-// Protect routes middleware
+// protect routes
 const protect = asyncHandler(async (req, res, next) => {
-   let token = req.cookies.jwt;
+   let token;
+   token = req.cookies.jwt;  
+   console.log()
 
    if (token) {
      try {
@@ -13,15 +14,16 @@ const protect = asyncHandler(async (req, res, next) => {
         req.user = await User.findById(decoded.userId).select('-password');
         next();
      } catch (error) {
-        console.log(error);
-        return next(new Error('Not authorized, token failed'));
+        console.log(error)
+        res.status(401);
+        throw new Error('Not authorized, token failed');
      }
    } else {
-      return next(new Error('Not authorized, no token'));
+      res.status(401);
+      throw new Error('Not authorized, no token');
    }
 });
 
-// Role-based Access Middleware
 const roleAccess = (roles) => {
   return asyncHandler(async (req, res, next) => {
     const user = req.user;

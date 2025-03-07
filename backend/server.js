@@ -19,18 +19,13 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "*", 
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: [
-      "X-CSRF-Token", 
-      "X-Requested-With", 
-      "Accept", 
-      "Content-Type", 
-      "Authorization"
-    ],
+    // origin: 'http://localhost:5173', 
+     origin: 'https://university-frontend-six.vercel.app', 
     credentials: true, 
   })
 );
+
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

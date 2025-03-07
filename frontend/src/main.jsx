@@ -39,6 +39,7 @@ const router = createBrowserRouter(
           <Route path='/getalluser' element={<GetAllUserScreen/>}/>
           <Route path='/categories' element={<CategoryListScreen/>}/>
       </Route>
+      
       <Route element={<PrivateRoute/>}>
         <Route path='/ideas' element={<IdeasScreen/>}/>
         <Route path="/department/:id/ideas" element={<DepartmentIdeaScreen />} />

@@ -10,12 +10,6 @@ const categorySchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    departments: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Department',
-      },
-    ],
   },
   {
     timestamps: true,

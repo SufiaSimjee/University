@@ -1,13 +1,12 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Category from '../models/categoryModel.js'
-import Department from '../models/departmentModel.js';
 
 // @desc    Create a category
 // @route   POST /api/categories/create
 // @access  Private/Admin, QA Manager
 const createCategory = asyncHandler(async (req, res) => {
     
-  const { name, departments, description } = req.body;  
+  const { name, description } = req.body;  
   
   const categoryExists = await Category.findOne({ name });
 
@@ -18,7 +17,6 @@ const createCategory = asyncHandler(async (req, res) => {
 
   const category = await Category.create({
     name,
-    departments: departments || [],  
     description
   });
   
@@ -30,12 +28,11 @@ const createCategory = asyncHandler(async (req, res) => {
   }
 });
 
-
 // @desc    Get all categories
 // @route   GET /api/categories/
 // @access  Private/Admin , QA Manager
 const getAllCategories = asyncHandler(async (req, res) => {
-    const categories = await Category.find({}).populate('departments', 'name');
+    const categories = await Category.find({});
     res.status(200).json(categories);
 });
 
@@ -77,7 +74,6 @@ const updateCategory = asyncHandler(async (req, res) => {
   if (category) {
 
     category.name = req.body.name || category.name;
-    category.departments = req.body.departments || category.departments;
     category.description = req.body.description || category.description;
 
     const updatedCategory = await category.save();
