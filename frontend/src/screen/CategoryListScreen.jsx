@@ -31,7 +31,7 @@ const CategoryListScreen = () => {
         </thead>
         <tbody>
           {categories?.map((category) => (
-            <tr key={category.id}>
+            <tr key={category._id}>
               <td>{category.id}</td>
               <td>{category.name}</td>
               <td>{category.description}</td>
