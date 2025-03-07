@@ -7,7 +7,6 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
       "headers": {
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Origin": "https://university-frontend-six.vercel.app",
