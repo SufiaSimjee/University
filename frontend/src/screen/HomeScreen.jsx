@@ -65,7 +65,7 @@ const HomeScreen = () => {
   return (
     <>
       <h1>University Innovation and Improvement Hub</h1>
-      <h2>ddd</h2>
+      <h2>UNiiiiiii</h2>
       {userInfo ? (
         <div>
           <h3>Welcome {userInfo.fullName}</h3>
