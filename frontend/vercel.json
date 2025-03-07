@@ -6,6 +6,6 @@
       {"src" : "/QAC/register" , "dest": "/"},
       {"src" : "/QA/register" , "dest" : "/"},
       {"src" : "/getalluser" , "dest" : "/"},
-      {"src" : "/categories" , "dest" : "/"},
+      {"src" : "/categories" , "dest" : "/"}
     ]
 }
