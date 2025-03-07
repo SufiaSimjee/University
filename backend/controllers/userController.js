@@ -94,6 +94,7 @@ const registerUser = asyncHandler(async (req, res) => {
     .populate('role', 'name');
 
   if (populatedUser) {
+    
     generateToken(res, user._id);
 
     res.status(200).json({
