@@ -45,6 +45,14 @@ const app = express();
 //   })
 // );
 
+app.enableCors({
+  origin: [
+  'http://localhost:5173',
+  'https://university-frontend-six.vercel.app'
+  ],
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  });
 
 app.use(cookieParser());
 app.use(express.json());
