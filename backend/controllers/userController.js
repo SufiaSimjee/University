@@ -3,7 +3,7 @@ import Department from '../models/departmentModel.js';
 import Role from '../models/roleModel.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import generateToken from "../utils/generateToken.js";
-import greeting from "../utils/generateToken.js";
+
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -18,7 +18,7 @@ const authUser = asyncHandler(async (req, res) => {
     if(user && await user.matchPassword(password)) {
         
      // generate jwt
-        greeting()
+       
         generateToken(res , user._id);
 
         res.status(200).json({

@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const greeting = () => {
-    console.log(`Hello`);
-  };
+
 
 const generateToken = (res , userId) => {
     // generate token
@@ -23,4 +21,4 @@ const generateToken = (res , userId) => {
       });
  };
 
-export default { greeting, generateToken };
+export default generateToken
