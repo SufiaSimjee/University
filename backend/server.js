@@ -10,7 +10,6 @@ import departmentRoutes from './routes/departmentRoutes.js';
 import roleRoutes from './routes/roleRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import ideaRoutes from './routes/ideaRoutes.js';
-import uploadRoutes from './routes/uploadRoutes.js';
 import Pusher from 'pusher';
 
 dotenv.config();
@@ -19,22 +18,35 @@ connectDB();
 
 const app = express();
 
+// List of allowed frontend URLs
+const allowedOrigins = [
+  'https://university-frontend-six.vercel.app',
+  'http://localhost:5173', 
+];
 
 // Middleware
+// app.use(
+//   cors({
+//     origin: 'http://localhost:7173', 
+//     origin: 'https://university-frontend-six.vercel.app', 
+//     credentials: true, 
+//   })
+// );
+
 app.use(
   cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-      'X-CSRF-Token',
-      'X-Requested-With',
-      'Accept',
-      'Content-Type',
-      'Authorization',
-    ],
-    credentials: true,
+    origin: (origin, callback) => {
+    
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'), false);
+      }
+    },
+    credentials: true, 
   })
 );
+
 
 app.use(cookieParser());
 app.use(express.json());
