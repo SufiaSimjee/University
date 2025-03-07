@@ -59,9 +59,6 @@ app.use('/api/departments', departmentRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/ideas', ideaRoutes);
 
-const __dirname = path.resolve();
-  app.use('/api/ideas', express.static(path.join(__dirname, '../uploads')));
-
 app.get('/', (req, res) => {
   res.send('Welcome to the API!');
 });
