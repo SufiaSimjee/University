@@ -26,8 +26,10 @@ app.use(express.urlencoded({ extended: true }));
 // Enable CORS
 const allowedOrigin = 'https://university-frontend-six.vercel.app'; 
 app.use(cors({
-  origin: allowedOrigin,  
-  credentials: true,      
+  origin: allowedOrigin,     
+  credentials: true,          
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+  allowedHeaders: ['X-CSRF-Token', 'X-Requested-With', 'Accept', 'Content-Type', 'Authorization'] 
 }));
 
 // Routes
