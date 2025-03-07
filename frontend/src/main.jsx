@@ -20,7 +20,7 @@ import QACRegisterScreen from './screen/QACRegisterScreen.jsx'
 import GetAllUserScreen from './screen/GetAllUserScreen.jsx'
 import AdminOrQAManagerRoute from './components/AdminOrQAManagerRoute.jsx'
 import PrivateRoute from './components/PrivateRoute.jsx'
-import IdeasScreen from './screen/IdeasScreen.jsx'
+import IdeaScreen from './screen/IdeaScreen.jsx'
 import DepartmentIdeaScreen from './screen/DepartmentIdeaScreen.jsx'
 import CategoryListScreen from './screen/CategoryListScreen.jsx'
 
@@ -40,7 +40,7 @@ const router = createBrowserRouter(
           <Route path='/categories' element={<CategoryListScreen/>}/>
       </Route>
       <Route element={<PrivateRoute/>}>
-        <Route path='/ideas' element={<IdeasScreen/>}/>
+        <Route path='/ideas' element={<IdeaScreen/>}/>
         <Route path="/department/:id/ideas" element={<DepartmentIdeaScreen />} />
       </Route>
 

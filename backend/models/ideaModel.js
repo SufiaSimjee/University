@@ -15,7 +15,7 @@ const ideaSchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     }],
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -24,15 +24,11 @@ const ideaSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    file: [
+    fileUrls: [
       {
-        fileUrl: 
-          { 
-            type: String 
-          },
-        default: null
+        type: String, // Stores file URLs
       },
-    ],
+    ],    
     agreeToTerms: {
        type: Boolean,
       default: false,
