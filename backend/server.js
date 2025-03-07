@@ -45,10 +45,21 @@ const app = express();
 //   })
 // );
 
-app.use(cors({
-  origin: 'https://university-frontend-six.vercel.app',
-  credentials: true,
-}));
+// Middleware
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'X-CSRF-Token',
+      'X-Requested-With',
+      'Accept',
+      'Content-Type',
+      'Authorization',
+    ],
+    credentials: true,
+  })
+);
 
 app.use(cookieParser());
 app.use(express.json());
