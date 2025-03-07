@@ -17,14 +17,28 @@ connectDB();
 const app = express();
 
 // Middleware
+// app.use(
+//   cors({
+//     // origin: 'http://localhost:5173', 
+//     origin: 'https://university-frontend-six.vercel.app', 
+//     credentials: true, 
+//   })
+// );
+
 app.use(
   cors({
-    // origin: 'http://localhost:5173', 
-    origin: 'https://university-frontend-six.vercel.app', 
-    credentials: true, 
+    origin: 'https://university-frontend-six.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'X-CSRF-Token',
+      'X-Requested-With',
+      'Accept',
+      'Content-Type',
+      'Authorization',
+    ],
+    credentials: true,
   })
 );
-
 
 app.use(cookieParser());
 app.use(express.json());
