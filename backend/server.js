@@ -16,28 +16,7 @@ connectDB();
 
 const app = express();
 
-// CORS middleware 
-const allowCors = (req, res, next) => {
-  const allowedOrigin = 'https://university-frontend-six.vercel.app'; 
-
-  const origin = req.headers.origin;
-  if (origin && origin === allowedOrigin) {
-    res.setHeader('Access-Control-Allow-Origin', allowedOrigin); 
-  }
-
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Content-Type, Authorization');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  next(); 
-};
-
-
-app.use(allowCors)
+app.use(cors({ origin: true, credentials: true }));
 
 app.use(cookieParser());
 app.use(express.json());
