@@ -18,6 +18,7 @@ const authUser = asyncHandler(async (req, res) => {
     if(user && await user.matchPassword(password)) {
         
      // generate jwt
+        greeting()
         generateToken(res , user._id);
 
         res.status(200).json({
