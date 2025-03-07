@@ -48,7 +48,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: '*',
+    origin: 'https://university-frontend-six.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
       'X-CSRF-Token',
