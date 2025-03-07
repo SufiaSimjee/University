@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import connectDB from './config/db.js';
 import cors from 'cors';
@@ -9,6 +10,7 @@ import departmentRoutes from './routes/departmentRoutes.js';
 import roleRoutes from './routes/roleRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import ideaRoutes from './routes/ideaRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 import Pusher from 'pusher';
 
 dotenv.config();
@@ -17,10 +19,11 @@ connectDB();
 
 const app = express();
 
-// const allowedOrigins = [
-//   'https://university-frontend-six.vercel.app',
-//   'http://localhost:5173',
-// ];
+// List of allowed frontend URLs
+const allowedOrigins = [
+  'https://university-frontend-six.vercel.app',
+  'http://localhost:5173', 
+];
 
 // Middleware
 // app.use(
@@ -31,44 +34,39 @@ const app = express();
 //   })
 // );
 
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
+app.use(
+  cors({
+    origin: (origin, callback) => {
     
-//       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error('Not allowed by CORS'), false);
-//       }
-//     },
-//     credentials: true, 
-//   })
-// );
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'), false);
+      }
+    },
+    credentials: true, 
+  })
+);
 
-app.enableCors({
-  origin: [
-  'http://localhost:5173',
-  'https://university-frontend-six.vercel.app'
-  ],
-  credentials: true,
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  });
 
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 // Routes
 app.use('/api/roles', roleRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api/users/ideas', ideaRoutes);
+app.use('/api/ideas', ideaRoutes);
+
+const __dirname = path.resolve();
+  app.use('/api/ideas', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', (req, res) => {
   res.send('Welcome to the API!');
 });
+
 
 app.listen(7000, () => {
   console.log('Server is running on port 7000');
