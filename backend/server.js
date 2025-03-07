@@ -17,10 +17,10 @@ connectDB();
 
 const app = express();
 
-const allowedOrigins = [
-  'https://university-frontend-six.vercel.app',
-  'http://localhost:5173',
-];
+// const allowedOrigins = [
+//   'https://university-frontend-six.vercel.app',
+//   'http://localhost:5173',
+// ];
 
 // Middleware
 // app.use(
@@ -45,25 +45,29 @@ const allowedOrigins = [
 //   })
 // );
 
-// Middleware
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'), false);
-      }
-    },
-    credentials: true, 
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-  })
-);
-
+// CORS middleware
+const allowCors = fn => async (req, res) => {
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  return await fn(req, res);
+};
 
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(allowCors);
 
 // Routes
 app.use('/api/roles', roleRoutes);
