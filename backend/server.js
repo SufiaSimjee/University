@@ -1,6 +1,5 @@
 import express from 'express';
 import path from 'path';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js'; 
@@ -17,19 +16,22 @@ connectDB();
 
 const app = express();
 
-const allowCors = fn => async (req, res) => {
+// CORS middleware 
+const allowCors = (req, res, next) => {
+  const allowedOrigin = 'https://university-frontend-six.vercel.app'; 
+
   res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', 'https://university-frontend-six.vercel.app'); 
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin); 
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Content-Type, Authorization');
   
-  // Handle OPTIONS requests for preflight
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
-  return await fn(req, res);
+
+  next(); 
 };
+
 
 app.use(allowCors);
 
