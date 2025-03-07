@@ -17,7 +17,6 @@ connectDB();
 
 const app = express();
 
-// List of allowed frontend URLs
 const allowedOrigins = [
   'https://university-frontend-six.vercel.app',
   'http://localhost:5173', 
@@ -45,7 +44,6 @@ app.use(
     credentials: true, 
   })
 );
-
 
 app.use(cookieParser());
 app.use(express.json());
