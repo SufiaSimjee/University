@@ -31,12 +31,12 @@ const allowCors = fn => async (req, res) => {
   return await fn(req, res);
 };
 
+app.use(allowCors);
 
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(allowCors);
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
