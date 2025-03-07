@@ -9,7 +9,7 @@ export default defineConfig({
       '/api': {
         target: 'https://university-rose.vercel.app',
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
     },
   }
