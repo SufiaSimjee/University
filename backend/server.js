@@ -20,8 +20,12 @@ const app = express();
 const allowCors = (req, res, next) => {
   const allowedOrigin = 'https://university-frontend-six.vercel.app'; 
 
+  const origin = req.headers.origin;
+  if (origin && origin === allowedOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigin); 
+  }
+
   res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', allowedOrigin); 
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Content-Type, Authorization');
   
@@ -33,7 +37,7 @@ const allowCors = (req, res, next) => {
 };
 
 
-app.use(allowCors);
+app.use(allowCors)
 
 app.use(cookieParser());
 app.use(express.json());
