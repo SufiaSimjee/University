@@ -16,7 +16,7 @@ const generateToken = (res , userId) => {
       // set jwt as httpOnly cookie
       res.cookie('jwt' , token, {
          httpOnly : true,
-         secure : process.env.NODE_ENV !== 'development',
+         secure: process.env.NODE_ENV === 'production',
          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
           domain : 'https://university-red.vercel.app',
           maxAge : 30 * 24 * 60 * 60 * 1000
