@@ -19,7 +19,7 @@ const app = express();
 
 const allowedOrigins = [
   'https://university-frontend-six.vercel.app',
-  'http://localhost:5173', 
+  'http://localhost:5173',
 ];
 
 // Middleware
@@ -31,10 +31,24 @@ const allowedOrigins = [
 //   })
 // );
 
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+    
+//       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error('Not allowed by CORS'), false);
+//       }
+//     },
+//     credentials: true, 
+//   })
+// );
+
+// Middleware
 app.use(
   cors({
     origin: (origin, callback) => {
-    
       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
         callback(null, true);
       } else {
@@ -42,8 +56,10 @@ app.use(
       }
     },
     credentials: true, 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
   })
 );
+
 
 app.use(cookieParser());
 app.use(express.json());
