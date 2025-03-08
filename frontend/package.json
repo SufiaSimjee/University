@@ -13,6 +13,8 @@
     "@reduxjs/toolkit": "^2.6.0",
     "axios": "^1.8.1",
     "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.7",
+    "group4": "file:..",
     "pusher-js": "^8.4.0",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
