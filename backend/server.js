@@ -22,23 +22,25 @@ connectDB();
 
 const app = express();
 
-// List of allowed frontend URLs
-const allowedOrigins = [
-  'http://localhost:5173',
-];
+// // List of allowed frontend URLs
+// const allowedOrigins = [
+//   'http://localhost:5173',
+// ];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'), false);
-      }
-    },
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error('Not allowed by CORS'), false);
+//       }
+//     },
+//     credentials: true,
+//   })
+// );
+
+app.use(cors()); 
 
 app.use(cookieParser());
 app.use(express.json());
