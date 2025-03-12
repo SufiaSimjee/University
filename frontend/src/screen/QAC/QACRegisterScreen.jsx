@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import FormContainer from "../components/FormContainer";
-import Loader from "../components/Loader";
-import { useRegisterMutation } from "../slices/usersApiSlice";
-import { setCredentials } from "../slices/authSlice";
+import FormContainer from "../../components/FormContainer";
+import Loader from "../../components/Loader";
+import { useRegisterMutation } from "../../slices/usersApiSlice";
+import { setCredentials } from "../../slices/authSlice";
 import { toast } from 'react-toastify';
-import { useGetAllRolesQuery } from "../slices/roleApiSlice";
-import { useGetAllDepartmentsQuery } from "../slices/departmentApiSlice"; 
+import { useGetAllRolesQuery } from "../../slices/roleApiSlice";
+import { useGetAllDepartmentsQuery } from "../../slices/departmentApiSlice"; 
 
 const AdminRegisterScreen = () => {
   const [fullName, setFullName] = useState("");
@@ -25,21 +25,12 @@ const AdminRegisterScreen = () => {
 
   const [register, { isLoading }] = useRegisterMutation();
 
-  const { search } = useLocation();
-  const sp = new URLSearchParams(search);
-  const redirect = sp.get('redirect') || '/';
 
-  
   const { data: roles, isLoading: rolesLoading, error: rolesError } = useGetAllRolesQuery();
   
 
   const { data: departments, isLoading: departmentsLoading, error } = useGetAllDepartmentsQuery();
 
-  useEffect(() => {
-    if (userInfo) {
-      navigate(redirect);
-    }
-  }, [userInfo, navigate, redirect]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -53,7 +44,7 @@ const AdminRegisterScreen = () => {
       const res = await register({ fullName, email, password, role, departments: selectedDepartments }).unwrap();
       dispatch(setCredentials({ ...res }));
       toast.success('Registration successful');
-      navigate(redirect);
+      navigate('/qac/users');
     } catch (error) {
       toast.error(error?.data?.message || error?.error);
     }
@@ -63,14 +54,9 @@ const AdminRegisterScreen = () => {
 
   return (
     <>
-      <div className="text-center mb-4 mt-5">
-        <h1>University Innovation & Improvement Hub</h1>
-        <p>Empowering Staff Ideas for a Better Future</p>
-      </div>
     <FormContainer>
-      <h1>Register for (QA Coordinator)</h1>
-      <h3>QA Coordinatort can register staff only</h3>
-
+      <h1>Add New User</h1>
+     
       <Form onSubmit={submitHandler}>
         {/* Full Name Input */}
         <Form.Group controlId="fullName" className="my-3">
@@ -174,14 +160,7 @@ const AdminRegisterScreen = () => {
         {isLoading && <Loader />}
       </Form>
 
-      <Row className="py-3">
-        <Col>
-          Already a user?{" "}
-          <Link to={redirect ? `/login?redirect=${redirect}` : '/login'}>
-            Login
-          </Link>
-        </Col>
-      </Row>
+    
     </FormContainer>
     </>
   );

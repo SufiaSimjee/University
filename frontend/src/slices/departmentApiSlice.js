@@ -8,6 +8,7 @@ export const departmentsApiSlice = apiSlice.injectEndpoints({
         url: DEPARTMENTS_URL,
         method: 'GET',
       }),
+      providesTags: ['Department'],
     }),
 
     getDepartmentById: builder.query({
@@ -23,18 +24,24 @@ export const departmentsApiSlice = apiSlice.injectEndpoints({
         body: data,
         method: 'POST',
       }),
+      invalidatesTags: ['Department'],
     }),
-    updateDepartment: builder.mutation({
-      query: (departmentId) => ({
-        url: `${DEPARTMENTS_URL}/${departmentId}`,
-        method: 'PUT',
-      }),
-    }),
+
+   updateDepartment: builder.mutation({
+    query: ({ id, data }) => ({
+    url: `${DEPARTMENTS_URL}/${id}`, 
+    method: 'PUT',
+    body: data, 
+  }),
+    invalidatesTags: ['Department'],
+   }),
+   
     deleteDepartment: builder.mutation({
       query: (departmentId) => ({
         url: `${DEPARTMENTS_URL}/${departmentId}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Department'],
     }),
   }),
 });

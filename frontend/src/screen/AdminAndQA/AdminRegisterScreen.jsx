@@ -1,45 +1,44 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import {  useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Button, Row, Col } from "react-bootstrap";
-import FormContainer from "../components/FormContainer";
-import Loader from "../components/Loader";
-import { useRegisterMutation } from "../slices/usersApiSlice";
-import { setCredentials } from "../slices/authSlice";
+import { Form, Button, Col } from "react-bootstrap";
+import FormContainer from "../../components/FormContainer";
+import Loader from "../../components/Loader";
+import { useRegisterMutation } from "../../slices/usersApiSlice";
+import { setCredentials } from "../../slices/authSlice";
 import { toast } from 'react-toastify';
-import { useGetAllRolesQuery } from "../slices/roleApiSlice";
-import { useGetAllDepartmentsQuery } from "../slices/departmentApiSlice"; 
+import { useGetAllRolesQuery } from "../../slices/roleApiSlice";
+import { useGetAllDepartmentsQuery } from "../../slices/departmentApiSlice"; 
 
-const QARegisterScreen = () => {
+const AdminRegisterScreen = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [selectedDepartments, setSelectedDepartments] = useState([]);
-  const [role, setRole] = useState(""); 
+  const [role, setRole] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { userInfo } = useSelector((state) => state.auth);
 
+  const { data: roles, isLoading: rolesLoading, error: rolesError } = useGetAllRolesQuery();
+
   const [register, { isLoading }] = useRegisterMutation();
 
-  const { search } = useLocation();
-  const sp = new URLSearchParams(search);
-  const redirect = sp.get('redirect') || '/';
+  // const { search } = useLocation();
+  // const sp = new URLSearchParams(search);
+  // const redirect = sp.get('redirect') || '/';
 
-  
-  const { data: roles, isLoading: rolesLoading, error: rolesError } = useGetAllRolesQuery();
-  
-
+  // Fetch departments
   const { data: departments, isLoading: departmentsLoading, error } = useGetAllDepartmentsQuery();
 
-  useEffect(() => {
-    if (userInfo) {
-      navigate(redirect);
-    }
-  }, [userInfo, navigate, redirect]);
+  // useEffect(() => {
+  //   if (userInfo) {
+  //     navigate(redirect);
+  //   }
+  // }, [userInfo, navigate, redirect]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -53,23 +52,16 @@ const QARegisterScreen = () => {
       const res = await register({ fullName, email, password, role, departments: selectedDepartments }).unwrap();
       dispatch(setCredentials({ ...res }));
       toast.success('Registration successful');
-      navigate(redirect);
+      navigate('/admin/users');
     } catch (error) {
       toast.error(error?.data?.message || error?.error);
     }
   };
-  
-  const filteredRoles = roles?.filter(role => role.name === "QA Coordinator" || role.name === "Staff" );
 
   return (
-    <>
-      <div className="text-center mb-4 mt-5">
-        <h1>University Innovation & Improvement Hub</h1>
-        <p>Empowering Staff Ideas for a Better Future</p>
-      </div>
+    <div className="d-flex justify-content-center align-items-center min-vh-100">
     <FormContainer>
-      <h1>Register for (QA Manager)</h1>
-      <h3>QA Manager can register QA Coordinator and Staff</h3>
+      <h1>Add New User</h1>
 
       <Form onSubmit={submitHandler}>
         {/* Full Name Input */}
@@ -130,7 +122,7 @@ const QARegisterScreen = () => {
               onChange={(e) => setRole(e.target.value)}
             >
               <option value="">Select Role</option>
-              {filteredRoles?.map((role) => (
+              {roles?.map((role) => (
                 <option key={role._id} value={role._id}>
                   {role.name}
                 </option>
@@ -165,26 +157,28 @@ const QARegisterScreen = () => {
           )}
         </Form.Group>
 
-        <Col className="d-grid gap-2">
-          <Button type="submit" variant="info" className="mt-2 rounded-0 text-white" disabled={isLoading}>
-            Register
-          </Button>
+       
+      <Col className="d-grid gap-2">
+        <Button type="submit" variant="info" className="mt-2 roundded-0 text-white"
+        disabled={isLoading}>
+         Register
+        </Button>
         </Col>
 
         {isLoading && <Loader />}
       </Form>
 
-      <Row className="py-3">
+      {/* <Row className="py-3">
         <Col>
           Already a user?{" "}
           <Link to={redirect ? `/login?redirect=${redirect}` : '/login'}>
             Login
           </Link>
         </Col>
-      </Row>
+      </Row> */}
     </FormContainer>
-    </>
+    </div>
   );
 };
 
-export default QARegisterScreen;
+export default AdminRegisterScreen;

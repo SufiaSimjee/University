@@ -1,5 +1,6 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Department from '../models/departmentModel.js';
+import  User from '../models/userModel.js';
 
 // @desc    POST create a department
 // @route   POST /api/departments/create
@@ -38,14 +39,27 @@ const getDepartmentById = asyncHandler(async (req, res) => {
 // @route   DELETE /api/departments/:id
 // @access  Private/Admin , QA Manager, QA Coordinator
 const deleteDepartment = asyncHandler(async (req, res) => {
-  const department = await Department.findById(req.params.id);
-  if (department) {
-    await Department.deleteOne({ _id: req.params.id });
-    res.status(200).json({ message: 'Department removed' });
-  } else {
+  const departmentId = req.params.id;
+  const department = await Department.findById(departmentId);
+  if (!department) {
     res.status(404);
-    throw new Error('Department not found');
+    throw new Error("Department not found");
   }
+
+  const relatedUsers = await User.find({ departments: departmentId });
+  if (relatedUsers.length > 0) {
+    res.status(400);
+    throw new Error("Cannot delete department because it has associated users");
+  }
+
+  const deletedDepartment = await Department.deleteOne({ _id: departmentId });
+
+  if (deletedDepartment.deletedCount === 0) {
+    res.status(500);
+    throw new Error("Failed to delete department");
+  }
+
+  res.status(200).json({ message: "Department deleted successfully" });
 });
 
 // @desc    Update a department

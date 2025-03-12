@@ -41,6 +41,33 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             }),
         }),
 
+        getAllUsers: builder.query({
+            query: () => ({
+                url: `${USERS_URL}`,
+            }),
+            keepUnusedDataFor: 5,
+        }),
+
+        getAllUsersForQa: builder.query({
+            query: () => ({
+                url: `${USERS_URL}/qa`,
+            }),
+            keepUnusedDataFor: 5,
+        }),
+
+        getAllUsersForQac: builder.query({
+            query: () => ({
+                url: `${USERS_URL}/qac`,
+            }),
+            keepUnusedDataFor: 5,
+        }) ,
+
+        getUserById: builder.query({
+            query: (id) => ({
+                url: `${USERS_URL}/${id}`,
+            }),
+            keepUnusedDataFor: 5,
+        })
     })
 });
 
@@ -48,5 +75,9 @@ export const {useLoginMutation ,
               useLogoutMutation , 
               useRegisterMutation ,
               useGetUserProfileQuery,
-              useUpdateUserMutation
+              useUpdateUserMutation, 
+              useGetAllUsersQuery , 
+              useGetUserByIdQuery , 
+              useGetAllUsersForQaQuery , 
+              useGetAllUsersForQacQuery
             } = usersApiSlice;

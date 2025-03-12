@@ -26,7 +26,7 @@ const ideaSchema = new mongoose.Schema(
     },
     fileUrls: [
       {
-        type: String, // Stores file URLs
+        type: String, 
       },
     ],    
     agreeToTerms: {
