@@ -1,62 +1,58 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Form, Button, Col } from "react-bootstrap";
 import FormContainer from "../../components/FormContainer";
 import Loader from "../../components/Loader";
 import { useRegisterMutation } from "../../slices/usersApiSlice";
 import { setCredentials } from "../../slices/authSlice";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { useGetAllRolesQuery } from "../../slices/roleApiSlice";
-import { useGetAllDepartmentsQuery } from "../../slices/departmentApiSlice"; 
+import { useGetAllDepartmentsQuery } from "../../slices/departmentApiSlice";
 
-const AdminRegisterScreen = () => {
+const QACRegisterScreen = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [selectedDepartments, setSelectedDepartments] = useState([]);
-  const [role, setRole] = useState(""); 
+  const [role, setRole] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { userInfo } = useSelector((state) => state.auth);
 
   const [register, { isLoading }] = useRegisterMutation();
-
-
   const { data: roles, isLoading: rolesLoading, error: rolesError } = useGetAllRolesQuery();
-  
-
   const { data: departments, isLoading: departmentsLoading, error } = useGetAllDepartmentsQuery();
-
 
   const submitHandler = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
 
     try {
       const res = await register({ fullName, email, password, role, departments: selectedDepartments }).unwrap();
       dispatch(setCredentials({ ...res }));
-      toast.success('Registration successful');
-      navigate('/qac/users');
+      toast.success("Registration successful");
+      navigate("/qac/users");
     } catch (error) {
       toast.error(error?.data?.message || error?.error);
     }
   };
-  
-  const filteredRoles = roles?.filter(role =>  role.name === "Staff");
+
+  const filteredRoles = roles?.filter((role) => role.name === "Staff");
+
+  const userDepartments = userInfo?.departments?.map((dept) => dept.id) || [];
+
+  const filteredDepartments = departments?.filter((dept) => userDepartments.includes(dept._id));
 
   return (
-    <>
     <FormContainer>
       <h1>Add New User</h1>
-     
       <Form onSubmit={submitHandler}>
         {/* Full Name Input */}
         <Form.Group controlId="fullName" className="my-3">
@@ -110,11 +106,7 @@ const AdminRegisterScreen = () => {
           ) : rolesError ? (
             <div>Error loading roles</div>
           ) : (
-            <Form.Control
-              as="select"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
+            <Form.Control as="select" value={role} onChange={(e) => setRole(e.target.value)}>
               <option value="">Select Role</option>
               {filteredRoles?.map((role) => (
                 <option key={role._id} value={role._id}>
@@ -138,11 +130,11 @@ const AdminRegisterScreen = () => {
               multiple
               value={selectedDepartments}
               onChange={(e) => {
-                const selectedValues = [...e.target.selectedOptions].map(o => o.value);
+                const selectedValues = [...e.target.selectedOptions].map((o) => o.value);
                 setSelectedDepartments(selectedValues);
               }}
             >
-              {departments?.map((department) => (
+              {filteredDepartments?.map((department) => (
                 <option key={department._id} value={department._id}>
                   {department.name}
                 </option>
@@ -159,11 +151,8 @@ const AdminRegisterScreen = () => {
 
         {isLoading && <Loader />}
       </Form>
-
-    
     </FormContainer>
-    </>
   );
 };
 
-export default AdminRegisterScreen;
+export default QACRegisterScreen;

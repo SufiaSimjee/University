@@ -15,18 +15,7 @@ const userSchema = new mongoose.Schema(
       password: {
         type: String,
         required: true,
-        minlength: 8,  
-        maxlength: 12, 
-        match: [
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/, 
-          "Password must be between 8 to 12 characters, contain at least one uppercase letter, one lowercase letter, one number, and one special character."
-        ],
       },
-      // role: {
-      //   type: String,
-      //   enum: ['Staff', 'QA Manager', 'QA Coordinator', 'Admin'],
-      //   default: 'Staff'
-      // },
 
       role: 
         {

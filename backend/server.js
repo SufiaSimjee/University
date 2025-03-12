@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// List of allowed frontend URLs
+//List of allowed frontend URLs
 // const allowedOrigins = [
 //   'http://localhost:5173',
 // ];
