@@ -134,7 +134,7 @@ const getAllIdeas = asyncHandler(async (req, res) => {
 
   if (role === 'Admin' || role === 'QA Manager') {
     const ideas = await Idea.find()
-      .select('title description category showAllDepartments createdAt')
+      .select('title description category showAllDepartments createdAt , isAnonymous')
       .populate('category', 'name')
       .populate({
         path: 'userId',
@@ -150,7 +150,7 @@ const getAllIdeas = asyncHandler(async (req, res) => {
   } else {
 
   const ideas = await Idea.find()
-    .select('title description category showAllDepartments createdAt')
+    .select('title description category showAllDepartments createdAt , isAnonymous')
     .populate('category', 'name')
     .populate({
       path: 'userId',
@@ -196,7 +196,7 @@ const getPopularIdeas = asyncHandler(async (req, res) => {
 
   if (role === 'Admin' || role === 'QA Manager') {
     ideas = await Idea.find()
-      .select('title description category showAllDepartments createdAt upVotes')
+      .select('title description category showAllDepartments createdAt upVotes , isAnonymous')
       .populate('category', 'name')
       .populate({
         path: 'userId',
@@ -210,7 +210,7 @@ const getPopularIdeas = asyncHandler(async (req, res) => {
       .limit(3); 
   } else {
     ideas = await Idea.find()
-      .select('title description category showAllDepartments createdAt upVotes')
+      .select('title description category showAllDepartments createdAt upVotes , isAnonymous')
       .populate('category', 'name')
       .populate({
         path: 'userId',
@@ -257,7 +257,7 @@ const getMostDownvotedIdeas = asyncHandler(async (req, res) => {
 
   if (role === 'Admin' || role === 'QA Manager') {
     ideas = await Idea.find()
-      .select('title description category showAllDepartments createdAt downVotes')
+      .select('title description category showAllDepartments createdAt  , isAnonymous')
       .populate('category', 'name')
       .populate({
         path: 'userId',
@@ -271,7 +271,7 @@ const getMostDownvotedIdeas = asyncHandler(async (req, res) => {
       .limit(3); 
   } else {
     ideas = await Idea.find()
-      .select('title description category showAllDepartments createdAt downVotes')
+      .select('title description category showAllDepartments createdAt downVotes , isAnonymous')
       .populate('category', 'name')
       .populate({
         path: 'userId',

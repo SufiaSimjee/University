@@ -133,7 +133,7 @@ const SingleIdeaScreen = () => {
           {/* Idea Header */}
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
-              <strong>Uploaded by : {idea.isAnonymous ? 'Anonymous' : idea.userId?.fullName}</strong>
+            <strong>Uploaded by : {idea.isAnonymous ? 'Anonymous' : idea.userId?.fullName}</strong>
             </div>
             <small className="text-muted">
               {new Date(idea.createdAt).toLocaleDateString('en-US', {
