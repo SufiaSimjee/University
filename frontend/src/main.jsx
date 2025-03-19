@@ -23,8 +23,7 @@ import AdminRegisterScreen from "./screen/AdminAndQA/AdminRegisterScreen.jsx"
 import QARegisterScreen from './screen/AdminAndQA/QARegisterScreen.jsx'
 import QACRegisterScreen from './screen/QAC/QACRegisterScreen.jsx'
 import PrivateRoute from './components/PrivateRoute.jsx'
-import IdeaScreen from './screen/IdeaScreen.jsx'
-import DepartmentIdeaScreen from './screen/DepartmentIdeaScreen.jsx'
+import CreateIdeaScreen from './screen/CreateIdeaScreen.jsx'
 import DepartmentListScreen from './screen/AdminAndQA/DepartmentListScreen.jsx'
 import CategoryListScreen from './screen/AdminAndQA/CategoryListScreen.jsx'
 import AddCategory from './screen/AdminAndQA/AddCategory.jsx'
@@ -35,6 +34,12 @@ import GetAllUserScreen from './screen/AdminAndQA/GetAllUserScreen.jsx'
 import GetAllUserForQAScreen from './screen/AdminAndQA/GetAllUserForQAScreen.jsx'
 import GetAllUserForQACScreen from './screen/QAC/GetAllUserQACScreen.jsx'
 import GetUserDetail from './screen/AdminAndQA/GetUserDetail.jsx'
+import SingleIdeaScreen from './screen/SingleIdeaScreen.jsx'
+import PopularIdeaScreen from './screen/PopularIdeaScreen.jsx'
+import DislikeIdeaScreen from './screen/DislikeIdeaScreen.jsx'
+import IdeaScreen from './screen/IdeaScreen.jsx'
+
+import ProfileScreen from './screen/ProfileScreen.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -76,10 +81,14 @@ const router = createBrowserRouter(
       <Route path='/QAC/register' element={<QACRegisterScreen/>}/>
         <Route path='/QAC/users' element={<GetAllUserForQACScreen/>}/>
       </Route>
-      
+     
       <Route element={<PrivateRoute/>}>
+        <Route path='/profile' element={<ProfileScreen/>}/>
+        <Route path='/ideas/create' element={<CreateIdeaScreen/>}/>
         <Route path='/ideas' element={<IdeaScreen/>}/>
-        <Route path="/department/:id/ideas" element={<DepartmentIdeaScreen />} />
+        <Route path='/ideas/popular' element={<PopularIdeaScreen/>}/>
+        <Route path='/ideas/dislike' element={<DislikeIdeaScreen/>}/>
+        <Route path='/ideas/:ideaId' element={<SingleIdeaScreen/>}/>
       </Route>
 
     </Route>

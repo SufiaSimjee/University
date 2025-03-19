@@ -8,5 +8,6 @@ export const USERS_URL = '/api/users';
 export const DEPARTMENTS_URL = '/api/departments';
 export const  CATEGORIES_URL = '/api/categories';
 export const  ROLES_URL = '/api/roles';
-export const  IDEAS_URL = '/api/users/ideas';
+export const  IDEAS_URL = '/api/ideas';
+
 

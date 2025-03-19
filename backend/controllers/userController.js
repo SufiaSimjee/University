@@ -1,5 +1,7 @@
+import mongoose from "mongoose";
 import  User  from "../models/userModel.js";
 import Department from '../models/departmentModel.js';
+import Idea from "../models/ideaModel.js";
 import Role from '../models/roleModel.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import generateToken from "../utils/generateToken.js";
@@ -9,36 +11,41 @@ import generateToken from "../utils/generateToken.js";
 // @route   POST /api/users/login
 // @access  Public
 const authUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    const {email , password} = req.body;
-    const user = await User.findOne({ email })
+  const user = await User.findOne({ email })
       .populate('departments', 'name')
       .populate('role', 'name');
 
-    if(user && await user.matchPassword(password)) {
-        
-     // generate jwt
-       
-        generateToken(res , user._id);
-
-        res.status(200).json({
-          _id : user._id,
-          fullName : user.fullName,
-          email: user.email,
-          role: {
-            id: user.role._id,  
-            name: user.role.name 
-          },
-          isActive :user.isActive,
-          departments: user.departments.map(department => ({
-            id: department._id,
-            name: department.name,
-          })),
-        });
-    } else {
+  if (user && user.isActive) {
+      if (await user.matchPassword(password)) {
+          generateToken(res, user._id);
+          res.status(200).json({
+              _id: user._id,
+              fullName: user.fullName,
+              email: user.email,
+              role: {
+                  id: user.role._id,
+                  name: user.role.name
+              },
+              isActive: user.isActive,
+              departments: user.departments.map(department => ({
+                  id: department._id,
+                  name: department.name,
+              })),
+          });
+      } else {
+          res.status(401);
+          throw new Error('Invalid email or password');
+      }
+  } else if (user && !user.isActive) {
+      // If user is inactive, throw an error
+      res.status(403);
+      throw new Error('Your account has been disabled');
+  } else {
       res.status(401);
       throw new Error('Invalid email or password');
-    } 
+  }
 });
 
 
@@ -124,6 +131,65 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 
+// @desc    Register a new user
+// @route   POST /api/users/add
+// @access  Public
+const registerUserForManager = asyncHandler(async (req, res) => {
+  const { fullName, email, password, role, departments } = req.body;
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/;
+  if (!passwordRegex.test(password)) {
+    res.status(400);
+    throw new Error('Password must be between 8 to 12 characters, contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+  }
+
+  const userExists = await User.findOne({ email })
+    .populate('departments', 'name')
+    .populate('role', 'name');
+
+  if (userExists) {
+    res.status(400);
+    throw new Error('User already exists');
+  }
+
+  let defaultRole;
+  if (!role) {
+    defaultRole = await Role.findOne({ name: 'Staff' });
+    if (!defaultRole) {
+      res.status(400);
+      throw new Error('Default role "Staff" not found');
+    }
+  } else {
+    defaultRole = await Role.findById(role);
+  }
+
+  if (role && defaultRole.name === 'QA Coordinator' && departments && departments.length > 0) {
+    const existingQA = await User.findOne({
+      role: defaultRole._id,
+      departments: { $in: departments },
+    }).populate('departments', 'name')
+      .populate('role', 'name');
+
+    if (existingQA) {
+      res.status(400);
+      throw new Error(`The department ${existingQA.departments[0].name} already has a QA Coordinator.`);
+    }
+  }
+
+  const user = await User.create({
+    fullName,
+    email,
+    password,
+    role: defaultRole._id,
+    isActive: true,
+    departments: departments || [],
+  });
+
+   if(user) {
+    res.status(200).json('User created successfully');
+   }
+});
+
 // @desc    Logout user / clear cookie
 // @route   POST /api/users/logout
 // @access  Private
@@ -142,15 +208,24 @@ const logoutUser = asyncHandler(async (req, res) => {
 // @route   GET /api/users/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).populate('departments', 'name');
+  const user = await User.findById(req.user._id)
+    .populate('departments', 'name')
+    .populate('role', 'name');
 
-  if(user) {
+    if (user) {
     res.status(200).json({
-      _id : user._id,
-      fullName : user.fullName,
+      _id: user._id,
+      fullName: user.fullName,
       email: user.email,
-      role: user.role,
-      departments: user.departments,
+      role: {
+        id: user.role._id,
+        name: user.role.name,
+      },
+      isActive: user.isActive,
+      departments: user.departments.map(department => ({
+        id: department._id,
+        name: department.name,
+      })),
     });
   } else {
     res.status(404);
@@ -163,7 +238,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // @access  Private
 const updateUserProfile = asyncHandler(async (req, res) => {
   
-  const user = await User.findById(req.user._id).populate('departments', 'name');
+  const user = await User.findById(req.user._id);
 
   if (user) {
     user.fullName = req.body.name || user.fullName;
@@ -174,18 +249,12 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       user.password = req.body.password;
     }
 
-    // Update departments if provided
-    if (req.body.departments && Array.isArray(req.body.departments)) {
-      user.departments = req.body.departments;
-    }
-
     const updatedUser = await user.save();
 
     res.status(200).json({
       _id: updatedUser._id,
       fullName: updatedUser.fullName,
       email: updatedUser.email,
-      departments: updatedUser.departments, 
     });
   } else {
     res.status(404);
@@ -307,14 +376,86 @@ const getUsersQAC = asyncHandler(async (req, res) => {
   res.status(200).json(staffUsers);
 });
 
+// @desc    Delete user and associtead idea
+// @route   DELETE /api/users/:id
+// @access  Private/Admin/QA Manager
+const deleteUser = asyncHandler(async (req, res) => {
+ 
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400);
+    throw new Error('Invalid user ID');
+  }
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  await Idea.deleteMany({ userId: id });
+
+  await User.findByIdAndDelete(id);
+
+  res.status(200).json({ message: 'User and associated ideas deleted successfully' });
+});
+
+
+// @desc    Update user information
+// @route   PUT /api/users/update/:id
+// @access  Private/Admin/QA Manager/ QA Coordinator
+const updateUserInfo = async (req, res) => {
+  try {
+    const { id } = req.params; 
+    const { fullName, email, password, role, departments, isActive } = req.body; 
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (fullName) user.fullName = fullName;
+    if (email) user.email = email;
+    if (password) user.password = password; 
+    if (isActive !== undefined) user.isActive = isActive;
+
+    if (role) {
+      const validRole = await Role.findById(role);
+      if (!validRole) {
+        return res.status(400).json({ message: "Invalid role" });
+      }
+      user.role = role;
+    }
+
+    if (departments && departments.length > 0) {
+      const validDepartments = await Department.find({ '_id': { $in: departments } });
+      if (validDepartments.length !== departments.length) {
+        return res.status(400).json({ message: "Invalid department(s)" });
+      }
+      user.departments = departments;
+    }
+
+    await user.save();
+
+
+    res.status(200).json({ message: "User information updated successfully", user });
+  } catch (error) {
+    throw new Error('Could not update user information"');
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 export {authUser , 
         registerUser , 
+        registerUserForManager,
         logoutUser, 
         getUsers , 
         getUsersQA ,
         getUsersQAC,
         getUserProfile ,
         updateUserProfile , 
-        getUserDetails
+        updateUserInfo,
+        getUserDetails ,
+        deleteUser,
       };

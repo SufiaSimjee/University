@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, Col } from "react-bootstrap";
 import FormContainer from "../../components/FormContainer";
 import Loader from "../../components/Loader";
-import { useRegisterMutation } from "../../slices/usersApiSlice";
+import { useRegisterForManagerMutation } from "../../slices/usersApiSlice";
 import { setCredentials } from "../../slices/authSlice";
 import { toast } from 'react-toastify';
 import { useGetAllRolesQuery } from "../../slices/roleApiSlice";
@@ -25,7 +25,7 @@ const AdminRegisterScreen = () => {
 
   const { data: roles, isLoading: rolesLoading, error: rolesError } = useGetAllRolesQuery();
 
-  const [register, { isLoading }] = useRegisterMutation();
+  const [register, { isLoading }] = useRegisterForManagerMutation();
 
   // const { search } = useLocation();
   // const sp = new URLSearchParams(search);
@@ -50,7 +50,7 @@ const AdminRegisterScreen = () => {
 
     try {
       const res = await register({ fullName, email, password, role, departments: selectedDepartments }).unwrap();
-      dispatch(setCredentials({ ...res }));
+    
       toast.success('Registration successful');
       navigate('/admin/users');
     } catch (error) {

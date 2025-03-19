@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import FormContainer from "../../components/FormContainer";
 import Loader from "../../components/Loader";
-import { useRegisterMutation } from "../../slices/usersApiSlice";
+import { useRegisterForManagerMutation } from "../../slices/usersApiSlice";
 import { setCredentials } from "../../slices/authSlice";
 import { toast } from 'react-toastify';
 import { useGetAllRolesQuery } from "../../slices/roleApiSlice";
@@ -23,7 +23,7 @@ const QARegisterScreen = () => {
 
   const { userInfo } = useSelector((state) => state.auth);
 
-  const [register, { isLoading }] = useRegisterMutation();
+  const [register, { isLoading }] = useRegisterForManagerMutation();
 
 
   const { data: roles, isLoading: rolesLoading, error: rolesError } = useGetAllRolesQuery();
@@ -42,7 +42,6 @@ const QARegisterScreen = () => {
 
     try {
       const res = await register({ fullName, email, password, role, departments: selectedDepartments }).unwrap();
-      dispatch(setCredentials({ ...res }));
       toast.success('Registration successful');
       navigate('/qa/users');
     } catch (error) {

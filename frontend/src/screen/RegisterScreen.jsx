@@ -63,7 +63,7 @@ const RegisterScreen = () => {
       </div>
 
     <FormContainer>
-      <h1>Sign In to Your Account (Staff) </h1>
+      <h1>Create Your Account</h1>
 
       <Form onSubmit={submitHandler}>
         {/* Full Name Input */}
