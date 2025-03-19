@@ -14,12 +14,12 @@ const GetUserDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { data: user, error, isLoading: userLoading  , refetch} = useGetUserByIdQuery(id);
+  const { data: user, error, isLoading: userLoading, refetch } = useGetUserByIdQuery(id);
   const { data: departments, isLoading: departmentsLoading } = useGetAllDepartmentsQuery();
   const { data: roles, isLoading: rolesLoading } = useGetAllRolesQuery();
 
   const [updateUserForManager, { isLoading: updatingUser }] = useUpdateUserForManagerMutation();
-  const [deleteUser, { isLoading: isDeleting  }] = useDeleteUserMutation(); 
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
 
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -66,7 +66,7 @@ const GetUserDetail = () => {
     e.preventDefault();
 
     const dataToUpdate = {
-      id: id, 
+      id: id,
       fullName: formData.fullName,
       email: formData.email,
       department: formData.department,
@@ -79,7 +79,6 @@ const GetUserDetail = () => {
       refetch();
       toast.success('User updated successfully.');
       if (userInfo.role.name === 'Admin') {
-        
         navigate('/admin/users');
       } else if (userInfo.role.name === 'QA Manager') {
         navigate('/qa/users');
@@ -101,14 +100,14 @@ const GetUserDetail = () => {
     } else if (userInfo.role.name === 'QA Coordinator') {
       return role.name !== 'Admin' && role.name !== 'QA Manager';
     }
-    return true; 
+    return true;
   });
 
   const filteredDepartments = departments?.filter(department => {
     if (userInfo.role.name === 'QA Coordinator') {
-      return department._id === userInfo.departments[0]?._id; 
+      return department._id === userInfo.departments[0]?._id;
     }
-    return true; 
+    return true;
   });
 
   return (
@@ -145,41 +144,69 @@ const GetUserDetail = () => {
               </Row>
 
               <Row>
-                <Col md={6}>
-                  <Form.Group controlId="department">
-                    <Form.Label>Department</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={formData.department}
-                      onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    >
-                      <option value="">Select Department</option>
-                      {filteredDepartments?.map((department) => (
-                        <option key={department._id} value={department._id}>
-                          {department.name}
-                        </option>
-                      ))}
-                    </Form.Control>
-                  </Form.Group>
-                </Col>
+                {userInfo.role.name !== 'QA Coordinator' ? (
+                  <>
+                    <Col md={6}>
+                      <Form.Group controlId="department">
+                        <Form.Label>Department</Form.Label>
+                        <Form.Control
+                          as="select"
+                          value={formData.department}
+                          onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                        >
+                          <option value="">Select Department</option>
+                          {filteredDepartments?.map((department) => (
+                            <option key={department._id} value={department._id}>
+                              {department.name}
+                            </option>
+                          ))}
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
 
-                <Col md={6}>
-                  <Form.Group controlId="role">
-                    <Form.Label>Role</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={formData.role}
-                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    >
-                      <option value="">Select Role</option>
-                      {filteredRoles?.map((role) => (
-                        <option key={role._id} value={role._id}>
-                          {role.name}
-                        </option>
-                      ))}
-                    </Form.Control>
-                  </Form.Group>
-                </Col>
+                    <Col md={6}>
+                      <Form.Group controlId="role">
+                        <Form.Label>Role</Form.Label>
+                        <Form.Control
+                          as="select"
+                          value={formData.role}
+                          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                        >
+                          <option value="">Select Role</option>
+                          {filteredRoles?.map((role) => (
+                            <option key={role._id} value={role._id}>
+                              {role.name}
+                            </option>
+                          ))}
+                        </Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </>
+                ) : (
+                  <>
+                    <Col md={6}>
+                      <Form.Group controlId="department">
+                        <Form.Label>Department</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={user.departments[0]?.name}
+                          readOnly
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    <Col md={6}>
+                      <Form.Group controlId="role">
+                        <Form.Label>Role</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={user.role?.name}
+                          readOnly
+                        />
+                      </Form.Group>
+                    </Col>
+                  </>
+                )}
               </Row>
 
               <Row>

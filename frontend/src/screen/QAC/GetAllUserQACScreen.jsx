@@ -19,7 +19,7 @@ const GetAllUserQACScreen = () => {
 
       {/* Show loading state */}
       {isLoading ? <Loader /> : error ? (
-        <Message variant="danger">Error loading users!</Message>
+        <Message variant="info">There are no users in the same department as you.</Message>
       ) : users?.length === 0 ? (
         <Message variant="info">There are no users in the same department as you.</Message>
       ) : (

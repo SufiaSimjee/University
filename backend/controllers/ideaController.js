@@ -2,7 +2,7 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import Idea from '../models/ideaModel.js';
 import User from '../models/userModel.js';
 import Role from '../models/roleModel.js';
-import Department from '../models/departmentModel.js'
+import Department from '../models/departmentModel.js';
 import mongoose from 'mongoose';
 import { GridFSBucket } from 'mongodb';
 import  Grid  from 'gridfs-stream';
@@ -124,6 +124,8 @@ const getAllIdeas = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id)
     .populate('role')  
     .populate('departments');  
+
+    console.log(user);
 
   if (!user) {
     res.status(404);

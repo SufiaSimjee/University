@@ -186,7 +186,20 @@ const registerUserForManager = asyncHandler(async (req, res) => {
   });
 
    if(user) {
-    res.status(200).json('User created successfully');
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      role: {
+        id: user.role._id,
+        name: user.role.name,
+      },
+      isActive: user.isActive,
+      departments: user.departments.map(department => ({
+        id: department._id,
+        name: department.name,
+      })),
+    });
    }
 });
 
@@ -241,7 +254,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
-    user.fullName = req.body.name || user.fullName;
+    user.fullName = req.body.fullName || user.fullName;
     user.email = req.body.email || user.email;
 
     // Update password if provided
@@ -406,45 +419,59 @@ const deleteUser = asyncHandler(async (req, res) => {
 // @desc    Update user information
 // @route   PUT /api/users/update/:id
 // @access  Private/Admin/QA Manager/ QA Coordinator
-const updateUserInfo = async (req, res) => {
-  try {
-    const { id } = req.params; 
-    const { fullName, email, password, role, departments, isActive } = req.body; 
-    const user = await User.findById(id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+const updateUserInfo = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { fullName, email, role, departments, isActive } = req.body;
 
-    if (fullName) user.fullName = fullName;
-    if (email) user.email = email;
-    if (password) user.password = password; 
-    if (isActive !== undefined) user.isActive = isActive;
+  const user = await User.findById(id);
 
-    if (role) {
-      const validRole = await Role.findById(role);
-      if (!validRole) {
-        return res.status(400).json({ message: "Invalid role" });
-      }
-      user.role = role;
-    }
-
-    if (departments && departments.length > 0) {
-      const validDepartments = await Department.find({ '_id': { $in: departments } });
-      if (validDepartments.length !== departments.length) {
-        return res.status(400).json({ message: "Invalid department(s)" });
-      }
-      user.departments = departments;
-    }
-
-    await user.save();
-
-
-    res.status(200).json({ message: "User information updated successfully", user });
-  } catch (error) {
-    throw new Error('Could not update user information"');
-    res.status(500).json({ message: "Server error" });
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
   }
-};
+
+  if (fullName) user.fullName = fullName;
+  if (email) user.email = email;
+
+  // Ensure isActive is only updated if explicitly provided
+  if (typeof isActive === "boolean") {
+    user.isActive = isActive;
+  }
+
+  // Validate and update role if provided
+  if (role) {
+    const validRole = await Role.findById(role);
+    if (!validRole) {
+      res.status(400);
+      throw new Error("Invalid role");
+    }
+    user.role = role;
+  }
+
+  // Validate and update departments if provided
+  if (departments && Array.isArray(departments) && departments.length > 0) {
+    const validDepartments = await Department.find({ _id: { $in: departments } });
+    if (validDepartments.length !== departments.length) {
+      res.status(400);
+      throw new Error("Invalid department(s)");
+    }
+    user.departments = departments;
+  }
+
+  const updatedUser = await user.save();
+
+  res.status(200).json({
+    message: "User information updated successfully",
+    user: {
+      _id: updatedUser._id,
+      fullName: updatedUser.fullName,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      departments: updatedUser.departments,
+      isActive: updatedUser.isActive,
+    },
+  });
+});
 
 export {authUser , 
         registerUser , 

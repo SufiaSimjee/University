@@ -41,7 +41,12 @@ const ProfileScreen = () => {
                     password,
                 }).unwrap();
                 
-                dispatch(setCredentials({ ...res }));
+                dispatch(setCredentials({
+                    ...userInfo,  
+                    fullName: res.fullName,  
+                    email: res.email,        
+                    password: res.password,  
+                }));
                 toast.success('Profile updated successfully');
             } catch (err) {
                 toast.error(err?.data?.message || err.error);
