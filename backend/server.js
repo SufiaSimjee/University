@@ -10,6 +10,7 @@ import departmentRoutes from './routes/departmentRoutes.js';
 import roleRoutes from './routes/roleRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import ideaRoutes from './routes/ideaRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
 
 dotenv.config();
 connectDB();
@@ -49,6 +50,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/ideas', ideaRoutes);
+app.use('/api/reports', reportRoutes);
 
 // multipart/form-data
 app.use("/uploads", express.static("uploads"));

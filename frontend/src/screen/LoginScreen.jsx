@@ -79,15 +79,14 @@ const LoginScreen = () => {
         {isLoading && <Loader />}
       </Form>
 
-      <Row className="py-3">
+      {/* <Row className="py-3">
       <Col>
            New Here?
            <Link to={redirect ? `/register?redirect=${redirect}` : '/register'}>
               Create An account
            </Link>
       </Col>
-
-      </Row>
+      </Row> */}
     </FormContainer>
   </>
   );

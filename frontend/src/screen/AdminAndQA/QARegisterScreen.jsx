@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, Row, Col } from "react-bootstrap";
@@ -20,17 +20,10 @@ const QARegisterScreen = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { userInfo } = useSelector((state) => state.auth);
-
   const [register, { isLoading }] = useRegisterForManagerMutation();
-
-
   const { data: roles, isLoading: rolesLoading, error: rolesError } = useGetAllRolesQuery();
-  
-
   const { data: departments, isLoading: departmentsLoading, error } = useGetAllDepartmentsQuery();
-
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -38,7 +31,8 @@ const QARegisterScreen = () => {
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
-    }
+    } 
+
 
     try {
       const res = await register({ fullName, email, password, role, departments: selectedDepartments }).unwrap();

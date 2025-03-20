@@ -26,7 +26,7 @@ const GetUserDetail = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    department: '',
+    departments: [],
     role: '',
     isActive: true,
   });
@@ -36,7 +36,7 @@ const GetUserDetail = () => {
       setFormData({
         fullName: user.fullName,
         email: user.email,
-        department: user.departments[0]?._id || '',
+        department: user.departments?.map(department => department._id) || [],
         role: user.role?._id || '',
         isActive: user.isActive,
       });
@@ -69,7 +69,7 @@ const GetUserDetail = () => {
       id: id,
       fullName: formData.fullName,
       email: formData.email,
-      department: formData.department,
+      departments: formData.department, 
       role: formData.role,
       isActive: formData.isActive,
     };
@@ -105,7 +105,7 @@ const GetUserDetail = () => {
 
   const filteredDepartments = departments?.filter(department => {
     if (userInfo.role.name === 'QA Coordinator') {
-      return department._id === userInfo.departments[0]?._id;
+      return userInfo.departments.some(userDepartment => userDepartment._id === department._id);
     }
     return true;
   });
@@ -147,21 +147,25 @@ const GetUserDetail = () => {
                 {userInfo.role.name !== 'QA Coordinator' ? (
                   <>
                     <Col md={6}>
-                      <Form.Group controlId="department">
-                        <Form.Label>Department</Form.Label>
-                        <Form.Control
-                          as="select"
-                          value={formData.department}
-                          onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                        >
-                          <option value="">Select Department</option>
-                          {filteredDepartments?.map((department) => (
-                            <option key={department._id} value={department._id}>
-                              {department.name}
-                            </option>
-                          ))}
-                        </Form.Control>
-                      </Form.Group>
+                    <Form.Group controlId="department">
+                    <Form.Label>Department</Form.Label>
+                    <Form.Control
+                     as="select"
+                     multiple
+                     value={formData.department} 
+                     onChange={(e) => setFormData({
+                     ...formData,
+                     department: Array.from(e.target.selectedOptions, option => option.value), // Handling multiple selections
+                      })}
+                      >
+    <option value="">Select Department(s)</option>
+    {filteredDepartments?.map((department) => (
+      <option key={department._id} value={department._id}>
+        {department.name}
+      </option>
+    ))}
+  </Form.Control>
+</Form.Group>
                     </Col>
 
                     <Col md={6}>
@@ -184,16 +188,16 @@ const GetUserDetail = () => {
                   </>
                 ) : (
                   <>
-                    <Col md={6}>
-                      <Form.Group controlId="department">
-                        <Form.Label>Department</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={user.departments[0]?.name}
-                          readOnly
-                        />
-                      </Form.Group>
-                    </Col>
+                 <Col md={6}>
+                  <Form.Group controlId="department">
+                  <Form.Label>Department</Form.Label>
+                  <Form.Control
+                   type="text"
+                   value={user.departments?.map(department => department.name).join(', ')}
+                   readOnly
+                 />
+                </Form.Group>
+                 </Col>
 
                     <Col md={6}>
                       <Form.Group controlId="role">

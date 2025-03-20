@@ -137,6 +137,11 @@ const registerUser = asyncHandler(async (req, res) => {
 const registerUserForManager = asyncHandler(async (req, res) => {
   const { fullName, email, password, role, departments } = req.body;
 
+  if(fullName == null || email == null || password == null || role == null ) {
+    res.status(400);
+    throw new Error('All fields are required');
+  }
+  
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/;
   if (!passwordRegex.test(password)) {
     res.status(400);
@@ -161,6 +166,11 @@ const registerUserForManager = asyncHandler(async (req, res) => {
     }
   } else {
     defaultRole = await Role.findById(role);
+  }
+
+  if ((defaultRole.name === 'Staff' || defaultRole.name === 'QA Coordinator') && (!departments || departments.length === 0)) {
+    res.status(400);
+    throw new Error(`Departments must be selected for the role "${defaultRole.name}".`);
   }
 
   if (role && defaultRole.name === 'QA Coordinator' && departments && departments.length > 0) {
@@ -369,23 +379,17 @@ const getUsersQAC = asyncHandler(async (req, res) => {
   const qaCoordinatorDepartments = req.user.departments.map(department => department._id);
 
   const staffUsers = await User.find({
-    role: staffRole._id,  
-    departments: { $in: qaCoordinatorDepartments },  
+    role: staffRole._id,
+    departments: { $in: qaCoordinatorDepartments },
   })
-    .populate({
-      path: 'departments',
-      select: 'name',
-    })
-    .populate({
-      path: 'role',
-      select: 'name',
-    });
+    .populate('departments', 'name') 
+    .populate('role', 'name');      
 
   if (!staffUsers || staffUsers.length === 0) {
     res.status(404);
-    throw new Error('No staff users found in this department(s)');
+    res.json({ message: 'No user found in the same department(s)' });
+    return;
   }
-
   res.status(200).json(staffUsers);
 });
 
@@ -417,7 +421,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 
 // @desc    Update user information
-// @route   PUT /api/users/update/:id
+// @route   PUT /api/users/update/:id/manager
 // @access  Private/Admin/QA Manager/ QA Coordinator
 const updateUserInfo = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -460,17 +464,7 @@ const updateUserInfo = asyncHandler(async (req, res) => {
 
   const updatedUser = await user.save();
 
-  res.status(200).json({
-    message: "User information updated successfully",
-    user: {
-      _id: updatedUser._id,
-      fullName: updatedUser.fullName,
-      email: updatedUser.email,
-      role: updatedUser.role,
-      departments: updatedUser.departments,
-      isActive: updatedUser.isActive,
-    },
-  });
+  res.status(200).json('message: User updated successfully');
 });
 
 export {authUser , 

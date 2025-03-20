@@ -11,9 +11,9 @@ import store from './store.js'
 import './assets/styles/bootstrap.custom.css'
 import './assets/styles/index.css'
 import App from './App.jsx'
+import NotFoundScreen from './screen/NotFoundScreen.jsx'
 import HomeScreen from './screen/HomeScreen.jsx'
 import LoginScreen from './screen/LoginScreen.jsx'
-import RegisterScreen from './screen/RegisterScreen.jsx'
 import AdminQAQACRoute from "./components/AdminQAQACRoute.jsx"
 import AdminOrQAManagerRoute from './components/AdminOrQAManagerRoute.jsx'
 import AdminRoute from './components/AdminRoute.jsx'
@@ -46,7 +46,7 @@ const router = createBrowserRouter(
     <Route path='/' element={<App />}> 
         <Route path='/' index='true' element={<HomeScreen/>}/>
         <Route path='/login' element={<LoginScreen/>}/>
-        <Route path='/register' element={<RegisterScreen/>}/>
+        <Route path="*" element={<NotFoundScreen />} />
 
         {/* Admin and QA Manager Routes */}
         <Route element={<AdminOrQAManagerRoute/>}> 

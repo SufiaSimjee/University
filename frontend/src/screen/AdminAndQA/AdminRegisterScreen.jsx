@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import {  useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, Col } from "react-bootstrap";
@@ -27,6 +27,8 @@ const AdminRegisterScreen = () => {
 
   const [register, { isLoading }] = useRegisterForManagerMutation();
 
+  
+
   // const { search } = useLocation();
   // const sp = new URLSearchParams(search);
   // const redirect = sp.get('redirect') || '/';
@@ -48,9 +50,11 @@ const AdminRegisterScreen = () => {
       return;
     }
 
+    
+  
+
     try {
       const res = await register({ fullName, email, password, role, departments: selectedDepartments }).unwrap();
-    
       toast.success('Registration successful');
       navigate('/admin/users');
     } catch (error) {
