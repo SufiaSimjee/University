@@ -2,6 +2,7 @@ import { useGetAllCategoriesQuery, useDeleteCategoryMutation } from "../../slice
 import { Button, Table } from 'react-bootstrap'; 
 import { Link } from "react-router-dom";
 import { toast } from 'react-toastify';
+import DownloadCategoryCSVButton from "../../components/DownloadCategoryCSVButton";
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import Message from "../../components/Message";
 import Loader from "../../components/Loader";
@@ -29,6 +30,8 @@ const CategoryListScreen = () => {
       <Link to="/addCategory">
         <Button variant="info" className="mb-3">Add Category</Button>
       </Link>
+
+      <DownloadCategoryCSVButton/>
 
       {isLoading ? <Loader /> : error ? (
         <Message variant="danger">Error loading categories!</Message>

@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
 import DownloadButton from '../components/DownloadButton';
+import DownloadCSVButton from '../components/DownloadCSVButton';
+import DownloadZipButton from '../components/DownloadZipButton';
 
 const IdeaScreen = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -84,6 +86,14 @@ const IdeaScreen = () => {
           </Button>
         </Link>
       </div>
+
+      {userInfo.role.name === 'Admin' || userInfo.role.name === 'QA Manager' ? (
+        <>
+        <DownloadButton/>
+        <DownloadCSVButton/>
+        <DownloadZipButton/>
+        </>
+      ) : null}
 
       {/* Search & Filter Section */}
       <Form>

@@ -14,7 +14,6 @@ import {
   downVoteIdea ,
   getPopularIdeas,
   getMostDownvotedIdeas,
-  downloadIdeas
 } from '../controllers/ideaController.js';
 
 const router = express.Router();
@@ -26,8 +25,6 @@ router.route('/:id').get(protect, getIdeaById).delete(protect ,deleteIdea);
 router.route('/popular/idea').get(protect, getPopularIdeas);
 
 router.route('/dislike/idea').get(protect, getMostDownvotedIdeas);
-
-router.route('/download/export').post(protect ,roleAccess(['Admin' , 'QA Manager']), downloadIdeas);
 
 router .route('/create').post( protect ,upload.array('files'), createIdea);
 

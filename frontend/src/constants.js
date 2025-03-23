@@ -10,5 +10,7 @@ export const  CATEGORIES_URL = '/api/categories';
 export const  ROLES_URL = '/api/roles';
 export const  IDEAS_URL = '/api/ideas';
 export const STATISTICS_URL = '/api/reports';
+export const  FILE_DOWNLOAD_URL = '/api/download';
+export const CLOUSER_DATE_URL = '/api/closuredates';
 
 

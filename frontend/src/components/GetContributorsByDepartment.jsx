@@ -12,28 +12,32 @@ const GetNumberOfContributorsByDepartment = () => {
   if (isLoading) return <Loader />;
   if (error) return <Message> Error loading contributors data</Message>;
 
+  // Ensure data is not null or empty
+  if (!data || data.length === 0) {
+    return <Message>No contributor data available</Message>;
+  }
+
   const barChartData = {
-    labels: data.map((item) => item.department), 
+    labels: data.map((item) => item.departmentName), // Fix key name
     datasets: [
       {
         label: 'Number of Contributors',
-        data: data.map((item) => item.totalContributors), 
-        backgroundColor: '#FF6F61', 
-        borderColor: '#D32F2F', 
+        data: data.map((item) => item.totalContributors),
+        backgroundColor: '#FF6F61',
+        borderColor: '#D32F2F',
         borderWidth: 1,
       },
     ],
   };
 
   return (
-    <div>
-      <h1>Statistics Report</h1>
+   
 
-      <div style={{ marginBottom: '40px' }}>
+      <div style={{ marginBottom: '40px' }} className="col-lg-8 ">
         <h2>Number of Contributors by Department</h2>
-        <Bar data={barChartData} options={{ responsive: true }} />
+        <Bar data={barChartData} options={{ responsive: true, plugins: { legend: { position: "top" } } }} />
       </div>
-    </div>
+    
   );
 };
 

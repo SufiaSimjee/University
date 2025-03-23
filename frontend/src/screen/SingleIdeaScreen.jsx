@@ -17,6 +17,7 @@ import IdeaHeader from "../components/IdeaHeader";
 import FileDisplay from "../components/FileDisplay";
 import VoteButtons from "../components/VoteButton";
 import CommentSection from "../components/CommentSection";
+import DeleteIdeaButton from "../components/DeleteIdeaButton";
 
 const SingleIdeaScreen = () => {
   const { ideaId } = useParams();
@@ -144,6 +145,10 @@ const SingleIdeaScreen = () => {
                 minute: '2-digit',
               })}
             </small>
+          </div>
+          <div className="d-flex justify-content-end ">
+          <DeleteIdeaButton  ideaId={ideaId}/>
+          
           </div>
           <IdeaHeader
             title={idea.title}

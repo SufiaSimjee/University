@@ -94,7 +94,23 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 { type: 'User', id: 'qa' },    
                 { type: 'User', id: 'qac' },  
             ],
-          })
+          }),
+
+          forgotPassword: builder.mutation({
+            query: (email) => ({
+              url: `${USERS_URL}/forgotPassword`,
+              method: 'POST',
+              body: { email },
+            }),
+          }),
+      
+          resetPassword: builder.mutation({
+            query: (data) => ({
+              url: `${USERS_URL}/resetPassword`,
+              method: 'POST',
+              body: data,
+            }),
+          }),
     })
 });
 
@@ -108,5 +124,7 @@ export const {useLoginMutation ,
               useGetAllUsersForQacQuery,
               useDeleteUserMutation ,
               useRegisterForManagerMutation,
-              useUpdateUserForManagerMutation
+              useUpdateUserForManagerMutation,
+              useForgotPasswordMutation,
+              useResetPasswordMutation,
             } = usersApiSlice;

@@ -11,6 +11,8 @@ import roleRoutes from './routes/roleRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import ideaRoutes from './routes/ideaRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
+import fileDownloadRoutes from './routes/fileDownloadRoutes.js';
+import closureDateRoutes from './routes/clouserDateRoutes.js';
 
 dotenv.config();
 connectDB();
@@ -51,6 +53,8 @@ app.use('/api/departments', departmentRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/ideas', ideaRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/download', fileDownloadRoutes);
+app.use('/api/closuredates', closureDateRoutes);
 
 // multipart/form-data
 app.use("/uploads", express.static("uploads"));

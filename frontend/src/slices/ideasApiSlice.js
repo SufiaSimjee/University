@@ -9,6 +9,7 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
         url: `${IDEAS_URL}`,
         method: 'GET',
       }),
+      keepUnusedDataFor: 5,
       providesTags: ['Ideas'],
     }),
 
@@ -19,6 +20,7 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
           url: `${IDEAS_URL}/${ideaId}`,
           method: 'GET',
         }),
+        keepUnusedDataFor: 5,
         providesTags: (result, error, ideaId) => [{ type: 'Ideas', id: ideaId }],
       }),
 
@@ -28,6 +30,7 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
           url: `${IDEAS_URL}/popular/idea`,
           method: 'GET',
         }),
+        keepUnusedDataFor: 5,
         providesTags: ['Ideas'],
       }),
 
@@ -36,6 +39,7 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
           url: `${IDEAS_URL}/dislike/idea`,
           method: 'GET',
         }),
+        keepUnusedDataFor: 5,
         providesTags: ['Ideas'],
       }),
 
@@ -46,16 +50,19 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: data,
       }),
+      keepUnusedDataFor: 5,
       invalidatesTags: ['Ideas'],
     }),
 
 
     // Delete an idea
     deleteIdea: builder.mutation({
-      query: (ideaId) => ({
-        url: `${IDEAS_URL}/${ideaId}`,
+      query: (id) => ({
+        url: `${IDEAS_URL}/${id}`,
         method: 'DELETE',
       }),
+      keepUnusedDataFor: 5,
+      invalidatesTags: ['Ideas'],
     }),
 
     // Create a comment
@@ -65,6 +72,7 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: commentData,
       }),
+      keepUnusedDataFor: 5,
       invalidatesTags: ['Ideas'],
     }),
 
@@ -74,6 +82,8 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
         url: `${IDEAS_URL}/comments/${ideaId}`,
         method: 'GET',
       }),
+      keepUnusedDataFor: 5,
+      providesTags: ['Ideas'],
     }),
 
     // Update a comment
@@ -83,6 +93,7 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: { text },
       }),
+      keepUnusedDataFor: 5,
       invalidatesTags: ['Ideas'],
     }),
 
@@ -92,6 +103,7 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
         url: `${IDEAS_URL}/comments/${ideaId}/${commentId}`,
         method: 'DELETE',
       }),
+      keepUnusedDataFor: 5,
       invalidatesTags: ['Ideas'],
     }),
 
@@ -101,6 +113,7 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
         url: `${IDEAS_URL}/upVotes/${ideaId}/${userId}`,
         method: 'POST',
       }),
+      keepUnusedDataFor: 5,
       invalidatesTags: ['Ideas'],
     }),
 
@@ -112,17 +125,13 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
         url: `${IDEAS_URL}/downVotes/${ideaId}/${userId}`,
         method: 'POST',
       }),
+      keepUnusedDataFor: 5,
       invalidatesTags: ['Ideas'],
     }),
 
-    downloadIdeas: builder.mutation({
-      query: () => ({
-        url: `${IDEAS_URL}/download/export`, 
-        method: 'POST',
-        responseHandler: (response) => response.blob(), 
-      }),
-      transformResponse: (response) => response,
-    }),
+    
+    
+  
   })
 });
 
@@ -139,6 +148,5 @@ export const {
   useDownVoteIdeaMutation,
   useGetPopularIdeasQuery,
   useGetMostDislikedIdeasQuery,
-  useDownloadIdeasMutation
  
 } = ideasApiSlice;

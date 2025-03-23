@@ -34,14 +34,13 @@ const GetAnonymousIdeasAndComments = () => {
   };
 
   return (
-    <div>
-      <h1>Statistics Report</h1>
+   
 
-      <div style={{ marginBottom: '40px' }}>
+      <div style={{ marginBottom: '40px' }} className="col-lg-8">
         <h2>Anonymous Ideas and Comments</h2>
         <Bar data={barChartData} options={{ responsive: true }} />
       </div>
-    </div>
+    
   );
 };
 

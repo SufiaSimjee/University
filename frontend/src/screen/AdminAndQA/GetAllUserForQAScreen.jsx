@@ -1,6 +1,7 @@
 import { useGetAllUsersForQaQuery } from "../../slices/usersApiSlice";
 import { Button, Table } from 'react-bootstrap'; 
 import { Link } from "react-router-dom";
+import DownloadCSVForQAButton from "../../components/DownloadCSVForQA";
 import { FaInfoCircle } from 'react-icons/fa';
 import Message from "../../components/Message";
 import Loader from "../../components/Loader";
@@ -16,6 +17,8 @@ const GetAllUserForQAScreen = () => {
       <Link to="/QA/register">
         <Button variant="info" className="mb-3">Add User</Button>
       </Link>
+
+      <DownloadCSVForQAButton />
 
       {isLoading ? <Loader /> : error ? (
         <Message variant="danger">Error loading users!</Message>

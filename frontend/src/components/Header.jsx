@@ -57,15 +57,6 @@ const Header = () => {
                 </Nav.Link>
               )}
 
-              {/* Staff and QA Coordinator */}
-              {/* {userInfo && (userInfo.role?.name === 'Staff' || userInfo.role?.name === 'QA Coordinator') && (
-                <NavDropdown title='Idea' id='idea'>
-                  <NavDropdown.Item as={Link} to='/ideas'>Idea</NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to='/ideas/popular'>Most Popular Idea</NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to='/dislike/ideas'>Most Disliked Idea</NavDropdown.Item>
-                </NavDropdown>
-              )} */}
-
               {/* Admin */}
               {userInfo && userInfo.role?.name === 'Admin' && (
                 <NavDropdown title='Admin' id='adminmenu'>
@@ -95,6 +86,22 @@ const Header = () => {
                   </NavDropdown.Item>
                 </NavDropdown>
               )}
+
+              {/* QA Manager and Admin */}
+              {userInfo && (userInfo.role?.name === 'Admin' || userInfo.role?.name === 'QA Manager') && (
+                <NavDropdown title='AcademicYear' id='academicYear'>
+                  <NavDropdown.Item as={Link} to='/academicYear/history'>
+                    History
+                  </NavDropdown.Item>
+
+                  <NavDropdown.Item as={Link} to='/academicYear'>
+                    Setting
+                  </NavDropdown.Item>
+
+          
+                </NavDropdown>
+              )}
+
 
               {/* QA Coordinator */}
               {userInfo && userInfo.role?.name === 'QA Coordinator' && (

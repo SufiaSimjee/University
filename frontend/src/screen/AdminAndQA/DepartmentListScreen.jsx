@@ -2,6 +2,7 @@ import { useGetAllDepartmentsQuery, useDeleteDepartmentMutation } from "../../sl
 import { Button, Table } from 'react-bootstrap'; 
 import { Link } from "react-router-dom";
 import { toast } from 'react-toastify'; 
+import DownloadDepartmentCSVButton from "../../components/DownloadDepartmentCSV";
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import Message from "../../components/Message";
 import Loader from "../../components/Loader";
@@ -29,6 +30,8 @@ const DepartmentListScreen = () => {
       <Link to='/addDepartment'>
         <Button variant="info" className="mb-3">Add Department</Button>
       </Link>
+
+      <DownloadDepartmentCSVButton />
 
       {isLoading ? <Loader /> : error ? (
         <Message variant="danger">Error loading departments!</Message>

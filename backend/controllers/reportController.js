@@ -3,6 +3,7 @@ import Idea from '../models/ideaModel.js';
 import User from '../models/userModel.js';
 import Role from '../models/roleModel.js';
 import Department from '../models/departmentModel.js';
+import Category from '../models/categoryModel.js';
 import mongoose from 'mongoose';
 
 // @desc Get Statistics Report
@@ -10,50 +11,41 @@ import mongoose from 'mongoose';
 // @access Admin, QA Manager
 const getIdeasByDepartment = asyncHandler(async (req, res) => {
   try {
-    const departmentIdeasCount = await Idea.aggregate([
+    const departmentIdeasCount = await Department.aggregate([
       {
         $lookup: {
-          from: 'users', 
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'user_info',
+          from: "users",
+          localField: "_id",
+          foreignField: "departments",
+          as: "users_info",
         },
       },
       {
-        $unwind: '$user_info', 
-      },
-      {
-        $unwind: '$user_info.departments', 
+        $lookup: {
+          from: "ideas",
+          localField: "users_info._id",
+          foreignField: "userId",
+          as: "ideas_info",
+        },
       },
       {
         $group: {
-          _id: '$user_info.departments', 
-          totalIdeas: { $sum: 1 }, 
+          _id: "$_id",
+          department: { $first: "$name" },
+          totalIdeas: { $sum: { $size: "$ideas_info" } }, 
         },
-      },
-      {
-      
-        $lookup: {
-          from: 'departments', 
-          localField: '_id',
-          foreignField: '_id',
-          as: 'department_info',
-        },
-      },
-      {
-        $unwind: '$department_info', 
       },
       {
         $project: {
-          department: '$department_info.name', 
-          totalIdeas: 1,
+          department: 1,
+          totalIdeas: { $ifNull: ["$totalIdeas", 0] }, 
         },
       },
     ]);
 
-    res.status(200).json(departmentIdeasCount); 
+    res.status(200).json(departmentIdeasCount);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' }); 
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -64,52 +56,48 @@ const getPercentageOfIdeasByDepartment = asyncHandler(async (req, res) => {
   try {
     const totalIdeasCount = await Idea.countDocuments();
 
-    const departmentIdeasCount = await Idea.aggregate([
+    const departmentIdeasCount = await Department.aggregate([
       {
         $lookup: {
-          from: 'users', 
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'user_info',
+          from: "users",
+          localField: "_id",
+          foreignField: "departments",
+          as: "users_info",
         },
       },
       {
-        $unwind: '$user_info', 
-      },
-      {
-        $unwind: '$user_info.departments', 
+        $lookup: {
+          from: "ideas",
+          localField: "users_info._id",
+          foreignField: "userId",
+          as: "ideas_info",
+        },
       },
       {
         $group: {
-          _id: '$user_info.departments', 
-          totalIdeas: { $sum: 1 }, 
+          _id: "$_id",
+          department: { $first: "$name" },
+          totalIdeas: { $sum: { $size: "$ideas_info" } }, 
         },
-      },
-      {
-        $lookup: {
-          from: 'departments', 
-          localField: '_id',
-          foreignField: '_id',
-          as: 'department_info',
-        },
-      },
-      {
-        $unwind: '$department_info', 
       },
       {
         $project: {
-          department: '$department_info.name', 
-          totalIdeas: 1,
+          department: 1,
+          totalIdeas: { $ifNull: ["$totalIdeas", 0] },
           percentage: {
-            $multiply: [{ $divide: ['$totalIdeas', totalIdeasCount] }, 100], 
+            $cond: {
+              if: { $eq: [totalIdeasCount, 0] }, 
+              then: 0,
+              else: { $multiply: [{ $divide: ["$totalIdeas", totalIdeasCount] }, 100] },
+            },
           },
         },
       },
     ]);
 
-    res.status(200).json(departmentIdeasCount); 
+    res.status(200).json(departmentIdeasCount);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' }); 
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -118,51 +106,80 @@ const getPercentageOfIdeasByDepartment = asyncHandler(async (req, res) => {
 // @access Admin, QA Manager
 const getContributorsByDepartment = asyncHandler(async (req, res) => {
   try {
-    const departmentContributorsCount = await Idea.aggregate([
+    const departmentContributorsCount = await Department.aggregate([
+   
       {
         $lookup: {
-          from: 'users', 
-          localField: 'userId', 
-          foreignField: '_id', 
-          as: 'user_info', 
+          from: "users",
+          localField: "_id",
+          foreignField: "departments",
+          as: "users",
         },
       },
-      {
-        $unwind: '$user_info', 
-      },
-      {
-        $unwind: '$user_info.departments', 
-      },
-      {
-        $group: {
-          _id: '$user_info.departments', 
-          totalContributors: { $addToSet: '$user_info._id' },  
-        },
-      },
+     
       {
         $lookup: {
-          from: 'departments', 
-          localField: '_id', 
-          foreignField: '_id', 
-          as: 'department_info', 
+          from: "ideas",
+          localField: "users._id",
+          foreignField: "userId",
+          as: "ideas",
         },
       },
       {
-        $unwind: '$department_info', 
+        $addFields: {
+          ideaAuthors: {
+            $map: {
+              input: "$ideas",
+              as: "idea",
+              in: "$$idea.userId",
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          commentAuthors: {
+            $reduce: {
+              input: "$ideas",
+              initialValue: [],
+              in: { $setUnion: ["$$value", "$$this.comments.userId"] },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          contributors: {
+            $setUnion: ["$ideaAuthors", "$commentAuthors"],
+          },
+        },
+      },
+      {
+        $addFields: {
+          contributors: {
+            $filter: {
+              input: "$contributors",
+              as: "contributor",
+              cond: { $ne: ["$$contributor", null] },
+            },
+          },
+        },
       },
       {
         $project: {
-          department: '$department_info.name',
-          totalContributors: { $size: '$totalContributors' }, 
+          departmentName: "$name",
+          totalContributors: { $size: "$contributors" },
         },
       },
     ]);
 
-    res.status(200).json(departmentContributorsCount); 
+    res.status(200).json(departmentContributorsCount);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' }); 
+    console.error("Error: ", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 // @desc Get Statistics Report
 // @route GET /api/reports/getanonymousIdeasAndComments
@@ -203,8 +220,144 @@ const getAnonymousIdeasAndComments = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc Get Statistics Report
+// @route GET /api/reports/getIdeasWithoutComments
+// @access Admin, QA Manager
+const getIdeasWithAndWithoutComments = asyncHandler(async (req, res) => {
+  try {
+    const ideasCount = await Idea.aggregate([
+      {
+        $project: {
+          hasComments: { $gt: [{ $size: "$comments" }, 0] }, 
+        },
+      },
+      {
+        $group: {
+          _id: "$hasComments", 
+          count: { $sum: 1 }, 
+        },
+      },
+    ]);
+
+    const ideasWithCommentsCount = ideasCount.find(item => item._id === true)?.count || 0;
+    const ideasWithoutCommentsCount = ideasCount.find(item => item._id === false)?.count || 0;
+
+    res.status(200).json({
+      ideasWithCommentsCount,
+      ideasWithoutCommentsCount,
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @desc Get Statistics Report
+// @route GET /api/reports/getCategoryCount
+// @access Admin, QA Manager
+const getCategoryCount = asyncHandler(async (req, res) => {
+  try {
+    const categoryCount = await Category.countDocuments();
+    res.status(200).json({ totalCategories: categoryCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @desc Get Statistics Report
+// @route GET /api/reports/getDepartmentCount
+// @access Admin, QA Manager
+const getDepartmentCount = asyncHandler(async (req, res) => {
+  try {
+    const departmentCount = await Department.countDocuments();
+    res.status(200).json({ totalDepartments: departmentCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message }); 
+  }
+});
+
+// @desc Get Statistics Report
+// @route GET /api/reports/getNonAnonymousIdeasCount
+// @access Admin, QA Manager
+const getNonAnonymousIdeasCount = asyncHandler(async (req, res) => {
+  try {
+    const nonAnonymousIdeasCount = await Idea.countDocuments({ isAnonymous: false });
+    res.status(200).json({ nonAnonymousIdeasCount });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// @desc Get Statistics Report
+// @route GET /api/reports/getAnonymousIdeasCount
+// @access Admin, QA Manager
+const getAnonymousIdeasCount = asyncHandler(async (req, res) => {
+  try {
+    const anonymousIdeasCount = await Idea.countDocuments({ isAnonymous: true });
+    res.status(200).json({ anonymousIdeasCount });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// @desc Get Statistics Report
+// @route GET /api/reports/getUserIdeasCount
+// @access Private
+const getUserIdeasCount = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const ideaCount = await Idea.countDocuments({ userId });
+  res.status(200).json({ ideaCount });
+});
+
+// @desc Get Statistics Report
+// @route GET /api/reports/getDepartmentUserCount
+// @access Private QA Coordinator
+const getDepartmentUserCount = async (req, res) => {
+  try {
+    const loggedInUser = req.user; 
+
+    if (!loggedInUser || !loggedInUser.departments || loggedInUser.departments.length === 0) {
+      return res.status(400).json({ message: "User has no departments assigned." });
+    }
+
+    const departmentIds = loggedInUser.departments.map((dept) => dept._id);
+
+    const userCounts = await User.aggregate([
+      { 
+        $match: { 
+          departments: { $in: departmentIds } 
+        } 
+      },
+      {
+        $lookup: {
+          from: "roles", 
+          localField: "role",
+          foreignField: "_id",
+          as: "roleInfo",
+        },
+      },
+      { $unwind: "$roleInfo" }, 
+      { $match: { "roleInfo.name": { $ne: "QA Coordinator" } } }, 
+      { $count: "totalUsers" } 
+    ]);
+
+    const totalUsers = userCounts.length > 0 ? userCounts[0].totalUsers : 0;
+
+    res.json({ totalUsers });
+  } catch (error) {
+    console.error("Error fetching user count:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 export { getIdeasByDepartment , 
          getPercentageOfIdeasByDepartment ,
          getContributorsByDepartment,
-         getAnonymousIdeasAndComments
+         getAnonymousIdeasAndComments,
+         getIdeasWithAndWithoutComments,
+         getCategoryCount,
+         getDepartmentCount,
+         getNonAnonymousIdeasCount,
+         getAnonymousIdeasCount,
+         getUserIdeasCount,
+         getDepartmentUserCount
         };

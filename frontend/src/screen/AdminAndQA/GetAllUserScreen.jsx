@@ -1,6 +1,7 @@
 import { useGetAllUsersQuery } from "../../slices/usersApiSlice";
 import { Button, Table } from 'react-bootstrap'; 
 import { Link } from "react-router-dom";
+import DownloadCSVForAdminButton from "../../components/DownloadCSVForAdmin";
 import { FaInfoCircle } from 'react-icons/fa';
 import Message from "../../components/Message";
 import Loader from "../../components/Loader";
@@ -16,6 +17,8 @@ const GetAllUserScreen = () => {
       <Link to="/admin/register">
         <Button variant="info" className="mb-3">Add User</Button>
       </Link>
+
+      <DownloadCSVForAdminButton />
 
       {isLoading ? <Loader /> : error ? (
         <Message variant="danger">Error loading users!</Message>

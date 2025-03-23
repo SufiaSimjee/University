@@ -67,12 +67,15 @@ const GetNumberOfIdeaByPercentage = () => {
   };
 
   return (
-    <div >
-      <div >
-        <h1 >Percentage of Ideas by Department</h1>
+    <div className="container" >
+    <h1>Percentage of Ideas by Department</h1>
+    <div className="row justify-content-center">
+      <div className="col-12 col-md-8 col-lg-6" style={{height: '50%'}}>
         <Pie data={pieChartData} options={options} />
       </div>
     </div>
+  </div>
+  
   );
 };
 

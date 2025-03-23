@@ -12,13 +12,15 @@ import nodemailer from 'nodemailer';
 import { text } from 'stream/consumers';
 import dotenv from 'dotenv';
 
+import stream from 'stream';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import archiver from 'archiver';
-import { createObjectCsvWriter } from 'csv-writer';
+import {createObjectCsvWriter} from 'csv-writer';
 import gridfsStream from 'gridfs-stream';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -375,24 +377,23 @@ const getIdeaById = asyncHandler(async (req, res) => {
 // @route   DELETE /api/ideas/:ideaId
 // @access  Private
 const deleteIdea = asyncHandler(async (req, res) => {
-  const ideaId = req.params.ideaId;
-  try {
-    const idea = await Idea.findByIdAndDelete(ideaId);
-    if (!idea) {
-      res.status(404);
-      throw new Error('Idea not found');
-    }
-
-    res.status(200).json({ message: 'Idea deleted successfully' });
-  } catch (error) {
-    res.status(500);
-    throw new Error('Idea could not be deleted');
+  const { id } = req.params;
+  const idea = await Idea.findById(id);
+  
+  if (!idea) {
+    return res.status(404).json({ message: 'Idea not found' });
   }
+
+  const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
+  idea.fileUrls.forEach(async (fileId) => {
+    await bucket.delete(new mongoose.Types.ObjectId(fileId)).catch(err => console.error(`Failed to delete file ${fileId}: ${err.message}`));
+  });
+
+  await Idea.findByIdAndDelete(id);
+  res.json({ message: 'Idea deleted successfully' });
 });
 
-// @desc    Create new comment
-// @route   POST /api/ideas/comment/create/:id
-// @access  Private
+
 // @desc    Create new comment
 // @route   POST /api/ideas/comment/create/:id
 // @access  Private
@@ -607,177 +608,6 @@ const downVoteIdea = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    download all ideas
-// @route   POST /api/ideas/download/export
-// @access  Private
-// const downloadIdeas = async (req, res) => {
-//   try {
-//     const ideas = await Idea.find()
-//       .populate('userId', 'fullName') 
-//       .populate('category', 'name'); 
-//     if (!ideas || ideas.length === 0) {
-//       return res.status(404).json({ message: 'No ideas found' });
-//     }
-
-//     const formattedIdeas = ideas.map((idea) => ({
-//       title: idea.title,
-//       description: idea.description,
-//       category: idea.category?.map(cat => cat.name).join(', ') || 'Uncategorized', 
-//       isAnonymous: idea.isAnonymous ? 'Yes' : 'No',
-//       showAllDepartments: idea.showAllDepartments ? 'Yes' : 'No',
-//       createdAt: idea.createdAt.toISOString(),
-//       userFullName: idea.userId?.fullName || 'Anonymous', 
-//     }));
-
-//     const csvPath = path.join(__dirname, 'ideas.csv');
-
-//     const csvWriter = createObjectCsvWriter({
-//       path: csvPath,
-//       header: [
-//         { id: 'title', title: 'Title' },
-//         { id: 'description', title: 'Description' },
-//         { id: 'category', title: 'Category' },
-//         { id: 'isAnonymous', title: 'Anonymous' },
-//         { id: 'showAllDepartments', title: 'Show All Departments' },
-//         { id: 'createdAt', title: 'Created At' },
-//         { id: 'userFullName', title: 'User Full Name' },
-//       ],
-//     });
-
-//     await csvWriter.writeRecords(formattedIdeas);
-
-//     const bucket = new GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
-//     const files = await bucket.find().toArray();
-
-//     if (files.length > 0) {
-//       const zipPath = path.join(__dirname, 'download.zip');
-//       const output = fs.createWriteStream(zipPath);
-//       const archive = archiver('zip', { zlib: { level: 9 } });
-
-//       output.on('close', () => {
-//         res.download(zipPath, 'download.zip', (err) => {
-//           if (err) {
-//             console.error('Error sending zip file', err);
-//           }
-//           fs.unlinkSync(zipPath); 
-//           fs.unlinkSync(csvPath); 
-//         });
-//       });
-
-//       archive.pipe(output);
-//       archive.file(csvPath, { name: 'ideas.csv' });
-//       for (const file of files) {
-//         const fileStream = bucket.openDownloadStream(file._id);
-//         archive.append(fileStream, { name: file.filename });
-//       }
-
-//       archive.finalize();
-//     } else {
-//       res.download(csvPath, 'ideas.csv', (err) => {
-//         if (err) {
-//           console.error('Error sending CSV file', err);
-//         }
-//         fs.unlinkSync(csvPath); 
-//       });
-//     }
-//   } catch (error) {
-//     console.error('Error generating CSV/zip file:', error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// };
-
-const downloadIdeas = async (req, res) => {
-  try {
-    const ideas = await Idea.find()
-      .populate('userId', 'fullName')
-      .populate('category', 'name');
-
-    if (!ideas || ideas.length === 0) {
-      return res.status(404).json({ message: 'No ideas found' });
-    }
-
-    const formattedIdeas = ideas.map((idea) => ({
-      title: idea.title,
-      description: idea.description,
-      category: idea.category?.map(cat => cat.name).join(', ') || 'Uncategorized',
-      isAnonymous: idea.isAnonymous ? 'Yes' : 'No',
-      showAllDepartments: idea.showAllDepartments ? 'Yes' : 'No',
-      createdAt: idea.createdAt.toISOString(),
-      userFullName: idea.userId?.fullName || 'Anonymous',
-    }));
-
-    const csvPath = path.join(__dirname, 'ideas.csv');
-
-    const csvWriter = createObjectCsvWriter({
-      path: csvPath,
-      header: [
-        { id: 'title', title: 'Title' },
-        { id: 'description', title: 'Description' },
-        { id: 'category', title: 'Category' },
-        { id: 'isAnonymous', title: 'Anonymous' },
-        { id: 'showAllDepartments', title: 'Show All Departments' },
-        { id: 'createdAt', title: 'Created At' },
-        { id: 'userFullName', title: 'User Full Name' },
-      ],
-    });
-
-    await csvWriter.writeRecords(formattedIdeas);
-
-    const bucket = new GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
-    const files = await bucket.find().toArray();
-
-    if (files.length > 0) {
-      // If ZIP file is requested
-      const zipPath = path.join(__dirname, 'files.zip');
-      const output = fs.createWriteStream(zipPath);
-      const archive = archiver('zip', { zlib: { level: 9 } });
-
-      output.on('close', () => {
-        // If both files requested
-        if (req.query.zipOnly) {
-          res.download(zipPath, 'files.zip', (err) => {
-            if (err) {
-              console.error('Error sending zip file', err);
-            }
-            fs.unlinkSync(zipPath);
-          });
-        } else {
-          // If both CSV and ZIP requested, send them in sequence
-          res.zip([
-            { path: csvPath, name: 'ideas.csv' },
-            { path: zipPath, name: 'files.zip' }
-          ], (err) => {
-            if (err) {
-              console.error('Error sending zip and CSV file', err);
-            }
-            fs.unlinkSync(zipPath);
-            fs.unlinkSync(csvPath);
-          });
-        }
-      });
-
-      archive.pipe(output);
-      archive.file(csvPath, { name: 'ideas.csv' });
-      for (const file of files) {
-        const fileStream = bucket.openDownloadStream(file._id);
-        archive.append(fileStream, { name: file.filename });
-      }
-
-      archive.finalize();
-    } else {
-      // If no files in the ZIP but CSV is requested
-      res.download(csvPath, 'ideas.csv', (err) => {
-        if (err) {
-          console.error('Error sending CSV file', err);
-        }
-        fs.unlinkSync(csvPath);
-      });
-    }
-  } catch (error) {
-    console.error('Error generating CSV/zip file:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
 
 export {
   createComment,
@@ -792,5 +622,5 @@ export {
   upVoteIdea,
   getPopularIdeas,
   getMostDownvotedIdeas,
-  downloadIdeas
+  
 };

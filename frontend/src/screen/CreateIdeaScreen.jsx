@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import FormContainer from '../components/FormContainer';
 import { useCreateIdeaMutation } from '../slices/ideasApiSlice';
 import { useGetAllCategoriesQuery } from '../slices/categoriesApiSlice';
+import {useGetLatestClosureDateQuery} from "../slices/clouserDateApiSlice"
 import {  useNavigate} from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom'; 
 
 const CreateIdeaScreen = () => {
   const [title, setTitle] = useState('');
@@ -18,7 +21,22 @@ const CreateIdeaScreen = () => {
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useGetAllCategoriesQuery();
   const [createIdea, { isLoading: ideaUploadLoading }] = useCreateIdeaMutation();
+  const {userInfo} = useSelector((state) => state.auth);
   const  navigate = useNavigate();
+
+  // Check if the idea closure date has passed
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const { data: closureDateData } = useGetLatestClosureDateQuery();  
+
+  useEffect(() => {
+    if (closureDateData && closureDateData.ideaClosureDate) {
+      const currentDate = new Date();
+      const ideaClosureDate = new Date(closureDateData.ideaClosureDate);
+      currentDate.setUTCHours(0, 0, 0, 0); 
+      ideaClosureDate.setUTCHours(0, 0, 0, 0); 
+      setIsButtonDisabled(currentDate >= ideaClosureDate);
+    }
+  }, [closureDateData]);
 
   // Handle form submission
   const submitHandler = async (e) => {
@@ -108,14 +126,16 @@ const CreateIdeaScreen = () => {
         </Form.Group>
 
         {/* Show to all departments checkbox */}
-        <Form.Group controlId="showAllDepartments" className="my-3">
-          <Form.Check
-            type="checkbox"
-            label="Show to all departments"
-            checked={showAllDepartments}
-            onChange={(e) => setShowAllDepartments(e.target.checked)}
-          />
-        </Form.Group>
+        {(userInfo?.role?.name === 'Staff' || userInfo?.role?.name === 'QA Coordinator') && (
+          <Form.Group controlId="showAllDepartments" className="my-3">
+            <Form.Check
+              type="checkbox"
+              label="Show to all departments"
+              checked={showAllDepartments}
+              onChange={(e) => setShowAllDepartments(e.target.checked)}
+            />
+          </Form.Group>
+        )}
 
         {/* Anonymous submission checkbox */}
         <Form.Group controlId="isAnonymous" className="mb-3">
@@ -131,16 +151,28 @@ const CreateIdeaScreen = () => {
         <Form.Group controlId="agreeToTerms">
           <Form.Check
             type="checkbox"
-            label="I agree to the terms and conditions"
+            // label="I agree to the terms and conditions"
+            label={
+              <>
+                I agree to the{' '}
+                <Link to="/termsAndConditions">terms and conditions</Link>
+              </>
+            }
             checked={agreeToTerms}
             onChange={(e) => setAgreeToTerms(e.target.checked)}
             required
           />
         </Form.Group>
 
-        <Button variant="info" type="submit" className="w-100" disabled={ideaUploadLoading}>
+        <Button variant="info" type="submit" className="w-100"     disabled={isButtonDisabled || ideaUploadLoading}>
           {ideaUploadLoading ? 'Submitting...' : 'Submit Idea'}
         </Button>
+
+        {isButtonDisabled && (
+          <p className='text-danger'>
+           Idea cannot be submitted after the idea closure date. 
+          </p>
+        )}
       </Form>
     </FormContainer>
   );

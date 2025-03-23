@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import Loader from "../components/Loader";
-import {useLoginMutation} from "../slices/usersApiSlice";
+import {useLoginMutation } from "../slices/usersApiSlice";
 import { setCredentials } from "../slices/authSlice";
 import {toast} from 'react-toastify';
 
@@ -78,6 +78,12 @@ const LoginScreen = () => {
 
         {isLoading && <Loader />}
       </Form>
+
+      <Row className="py-3 justify-content-end">
+          <Col className="text-center">
+            <Link to="/forgotPassword">Forgot Password</Link>
+          </Col>
+        </Row>
 
       {/* <Row className="py-3">
       <Col>

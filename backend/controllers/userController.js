@@ -5,7 +5,31 @@ import Idea from "../models/ideaModel.js";
 import Role from '../models/roleModel.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import generateToken from "../utils/generateToken.js";
+import dotenv from 'dotenv';
+import cryptoRandomString from 'crypto-random-string';
+import nodemailer from 'nodemailer';
 
+dotenv.config();
+
+//Function to send reset password email with code
+const sendResetPasswordEmail = async (email, code) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', 
+    auth: {
+      user: process.env.Node_Email, 
+      pass: process.env.Node_Password,   
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Password Reset Request',
+    text: `You requested a password reset. Use the following verification code within the next 2 hours to reset your password: ${code}`,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -19,7 +43,12 @@ const authUser = asyncHandler(async (req, res) => {
 
   if (user && user.isActive) {
       if (await user.matchPassword(password)) {
+          const lastLogin = user.lastLogin ? user.lastLogin : "This is your first login!";
+          user.lastLogin = new Date();
+          await user.save();
+
           generateToken(res, user._id);
+
           res.status(200).json({
               _id: user._id,
               fullName: user.fullName,
@@ -33,13 +62,13 @@ const authUser = asyncHandler(async (req, res) => {
                   id: department._id,
                   name: department.name,
               })),
+              lastLogin,  
           });
       } else {
           res.status(401);
           throw new Error('Invalid email or password');
       }
   } else if (user && !user.isActive) {
-      // If user is inactive, throw an error
       res.status(403);
       throw new Error('Your account has been disabled');
   } else {
@@ -48,6 +77,61 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Forget User Password
+// @route   POST /api/users/forgotPassword
+// @access  Public
+const forgotPassword = asyncHandler(async (req, res) => {
+  
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error('Your email address is not found');
+  }
+
+  const resetCode = cryptoRandomString({ length: 6, type: 'numeric' });
+
+  await sendResetPasswordEmail(email, resetCode);
+
+  user.resetCode = resetCode;
+  user.resetCodeExpiration = Date.now() + 2 * 60 * 60 * 1000; 
+  await user.save();
+
+  res.status(200).json({ message: 'Verification code sent to your email' });
+});
+
+// @desc    Reset User Password
+// @route   POST /api/users/resetPassword
+// @access  Public
+const resetPassword = asyncHandler(async (req, res) => {
+  const { email, resetCode, newPassword } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error('Your email address is not found');
+  }
+
+  if (user.resetCode !== resetCode) {
+    res.status(400);
+    throw new Error('Invalid reset code');
+  }
+
+  if (user.resetCodeExpiration < Date.now()) {
+    res.status(400);
+    throw new Error('Reset code has expired');
+  }
+
+  user.password = newPassword;
+  user.resetCode = undefined; 
+  user.resetCodeExpiration = undefined; 
+  await user.save();
+
+  res.status(200).json({ message: 'Password reset successfully' });
+});
 
 // @desc    Register a new user
 // @route   POST /api/users
@@ -479,4 +563,6 @@ export {authUser ,
         updateUserInfo,
         getUserDetails ,
         deleteUser,
+        forgotPassword,
+        resetPassword
       };

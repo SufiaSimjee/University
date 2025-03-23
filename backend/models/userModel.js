@@ -33,7 +33,19 @@ const userSchema = new mongoose.Schema(
       isActive: {
         type: Boolean,
         default: true
-      } 
+      } ,
+
+      resetCode: {
+        type: String,
+      },
+      resetCodeExpiration: {
+        type: Date,
+      },
+
+      lastLogin: {
+        type: Date,
+      }
+      
      },
       {
           timestamps: true,

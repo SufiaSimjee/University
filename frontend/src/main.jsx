@@ -38,7 +38,11 @@ import SingleIdeaScreen from './screen/SingleIdeaScreen.jsx'
 import PopularIdeaScreen from './screen/PopularIdeaScreen.jsx'
 import DislikeIdeaScreen from './screen/DislikeIdeaScreen.jsx'
 import IdeaScreen from './screen/IdeaScreen.jsx'
-
+import TermsAndConditionsScreen from './screen/TermsAndConditionScreen.jsx'
+import ForgotPasswordScreen from './screen/ForgetPasswordScreen.jsx'
+import AcademicYearUpdateScreen from './screen/AdminAndQA/AcademicYearUpdateScreen.jsx'
+import AcademicYearScreen from './screen/AdminAndQA/AcademicYearScreen.jsx'
+import AcademicYearCreateScreen from './screen/AdminAndQA/AcademicYearCreateScreen.jsx'
 import ProfileScreen from './screen/ProfileScreen.jsx'
 
 const router = createBrowserRouter(
@@ -47,6 +51,8 @@ const router = createBrowserRouter(
         <Route path='/' index='true' element={<HomeScreen/>}/>
         <Route path='/login' element={<LoginScreen/>}/>
         <Route path="*" element={<NotFoundScreen />} />
+        <Route path='/termsAndConditions' element={<TermsAndConditionsScreen/>}/>
+        <Route path='/forgotPassword' element={<ForgotPasswordScreen/>}/>
 
         {/* Admin and QA Manager Routes */}
         <Route element={<AdminOrQAManagerRoute/>}> 
@@ -57,6 +63,9 @@ const router = createBrowserRouter(
           <Route path='/addDepartment' element={<AddDepartment/>}/>
           <Route path='/editDepartment/:id' element={<EditDepartment />} />
           <Route path='/users' element={<GetAllUserScreen/>}/>
+          <Route path='/academicYear' element={<AcademicYearUpdateScreen/>}/>
+          <Route path='/academicYear/History' element={<AcademicYearScreen/>}/>
+          <Route path='/academicYear/create' element={<AcademicYearCreateScreen/>}/>
       </Route>
 
       {/* Admin , QA Manager , QA Coordinator Routes */}

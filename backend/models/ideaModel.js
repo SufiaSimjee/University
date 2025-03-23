@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import User from './userModel.js';
 
 const ideaSchema = new mongoose.Schema(
   {
@@ -82,6 +83,18 @@ const ideaSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+
+ideaSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    const user = await User.findById(this.userId).populate('role');
+    if (user && user.role && (user.role.name === 'Admin' || user.role.name === 'QA Manager')) {
+      this.showAllDepartments = true;
+    }
+  }
+  next();
+});;
+
 
 const Idea = mongoose.model('Idea', ideaSchema);
 
