@@ -447,7 +447,7 @@ const createComment = asyncHandler(async (req, res) => {
       from: process.env.Email,
       to: ideaOwner.email,
       subject: `New Comment on Your Idea: ${idea.title}`,
-      text: `Hello ${ideaOwner.name},\n\nYou have received a new comment on your idea titled "${idea.title}".\n\nComment: ${text}\n\nBest regards,\n University`,
+      text: `Hello ${ideaOwner.fullName},\n\nYou have received a new comment on your idea titled "${idea.title}".\n\nComment: ${text}\n\nBest regards,\n University`,
     };
 
     await transporter.sendMail(mailOptions);
