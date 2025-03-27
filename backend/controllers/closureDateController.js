@@ -65,6 +65,7 @@ import ClosureDate from '../models/ClouserDatesModel.js';
 const createClosureDate = asyncHandler(async (req, res) => {
   const { academicYearStart, academicYearEnd, ideaClosureDate, finalClosureDate } = req.body;
 
+  // Check for empty or invalid academic years
   if (!academicYearStart || !academicYearEnd || !ideaClosureDate || !finalClosureDate) {
     res.status(400);
     throw new Error("All fields are required.");

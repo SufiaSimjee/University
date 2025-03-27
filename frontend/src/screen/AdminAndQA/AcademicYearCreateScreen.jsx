@@ -27,7 +27,7 @@ const AcademicYearCreateScreen = () => {
       setAcademicYearEnd('');
       setIdeaClosureDate('');
       setFinalClosureDate('');
-      navigate('academicYear/history');
+      navigate('/academicYear/history');
     } catch (err) {
       const message = err?.data?.message || err?.error || 'Error creating closure date';
       toast.error(message);
