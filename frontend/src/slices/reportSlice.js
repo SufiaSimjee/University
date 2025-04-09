@@ -100,7 +100,26 @@ export const reportApiSlice = apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor: 5,
       providesTags: ['Report'],
-    })
+    }),
+
+    getMostActiveUser: builder.query({
+      query: () => ({
+        url: `${STATISTICS_URL}/getmostactiveuser`,
+        method: 'GET',
+      }),
+      keepUnusedDataFor: 5,
+      providesTags: ['Report'],
+    }),
+
+    getUserActivityStats: builder.query({
+      query: () => ({
+        url: `${STATISTICS_URL}/useractivitystats`,
+        method: 'GET',
+      }),
+      keepUnusedDataFor: 5,
+      providesTags: ['Report'],
+    }),
+
   }),
 });
 
@@ -114,5 +133,7 @@ export const { useGetNumberofIdeasByDepartmentQuery ,
                useGetNonAnonymousIdeasCountQuery,
                useGetAnonymousIdeasCountQuery,
                useGetUserIdeasCountQuery,
-               useGetdepartmentusercountQuery
+               useGetdepartmentusercountQuery, 
+               useGetMostActiveUserQuery,
+               useGetUserActivityStatsQuery       
              } = reportApiSlice;

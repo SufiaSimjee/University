@@ -84,7 +84,6 @@ const ideaSchema = new mongoose.Schema(
   }
 );
 
-
 ideaSchema.pre('save', async function (next) {
   if (this.isNew) {
     const user = await User.findById(this.userId).populate('role');

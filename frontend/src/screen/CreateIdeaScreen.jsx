@@ -8,6 +8,7 @@ import {useGetLatestClosureDateQuery} from "../slices/clouserDateApiSlice"
 import {  useNavigate} from "react-router-dom";
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom'; 
+import {FaArrowAltCircleLeft} from 'react-icons/fa'; 
 
 const CreateIdeaScreen = () => {
   const [title, setTitle] = useState('');
@@ -67,6 +68,8 @@ const CreateIdeaScreen = () => {
   };
 
   return (
+    <>
+    <Link to="/ideas" className="btn btn-dark my-3"><FaArrowAltCircleLeft/> Go Back</Link>
     <FormContainer>
       <h2 className="text-center my-4">Submit Your Idea</h2>
       <Form onSubmit={submitHandler}>
@@ -175,6 +178,7 @@ const CreateIdeaScreen = () => {
         )}
       </Form>
     </FormContainer>
+    </>
   );
 };
 

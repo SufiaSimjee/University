@@ -13,12 +13,12 @@ import ideaRoutes from './routes/ideaRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import fileDownloadRoutes from './routes/fileDownloadRoutes.js';
 import closureDateRoutes from './routes/clouserDateRoutes.js';
+import ideaReportRoutes from './routes/ideaReportRoutes.js';
 
 dotenv.config();
 connectDB();
 
 const app = express();
-
 
 //List of allowed frontend URLs
 // const allowedOrigins = [
@@ -45,7 +45,6 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
 // Routes
 app.use('/api/roles', roleRoutes);
 app.use('/api/users', userRoutes);
@@ -55,6 +54,7 @@ app.use('/api/ideas', ideaRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/download', fileDownloadRoutes);
 app.use('/api/closuredates', closureDateRoutes);
+app.use('/api/ideareports', ideaReportRoutes);
 
 // multipart/form-data
 app.use("/uploads", express.static("uploads"));

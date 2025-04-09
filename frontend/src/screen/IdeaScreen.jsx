@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useGetAllIdeasQuery } from '../slices/ideasApiSlice';
+import { useGetAllIdeasQuery , useDeleteIdeaMutation } from '../slices/ideasApiSlice';
 import { useGetAllCategoriesQuery } from '../slices/categoriesApiSlice';
 import { useGetAllDepartmentsQuery } from '../slices/departmentApiSlice'; 
 import { Card, Button, Badge, Form, Row, Col, Pagination } from 'react-bootstrap';
@@ -10,6 +10,7 @@ import Loader from '../components/Loader';
 import DownloadButton from '../components/DownloadButton';
 import DownloadCSVButton from '../components/DownloadCSVButton';
 import DownloadZipButton from '../components/DownloadZipButton';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const IdeaScreen = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -20,6 +21,7 @@ const IdeaScreen = () => {
   const ideasPerPage = 5;
 
   const { data: ideas, error, isLoading } = useGetAllIdeasQuery();
+  const [deleteIdea] = useDeleteIdeaMutation();
   const { data: categories } = useGetAllCategoriesQuery();
 
   const { data: allDepartments } = useGetAllDepartmentsQuery({
@@ -62,6 +64,18 @@ const IdeaScreen = () => {
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this idea?')) {
+      try {
+        await deleteIdea(id).unwrap();
+        alert('Idea deleted successfully');
+      } catch (err) {
+        alert('Error deleting idea. Please try again.');
+        console.error(err);
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="text-center mt-5">
@@ -89,9 +103,9 @@ const IdeaScreen = () => {
 
       {userInfo.role.name === 'Admin' || userInfo.role.name === 'QA Manager' ? (
         <>
-        <DownloadButton/>
-        <DownloadCSVButton/>
-        <DownloadZipButton/>
+          <DownloadButton/>
+          <DownloadCSVButton/>
+          <DownloadZipButton/>
         </>
       ) : null}
 
@@ -154,17 +168,48 @@ const IdeaScreen = () => {
               {/* Uploader Name and Timestamp at the Top */}
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                  <strong>Uploaded by : {idea.isAnonymous ? 'Anonymous' : idea.userId?.fullName}</strong>
+                  <strong>Uploaded by: {idea.isAnonymous ? 'Anonymous' : idea.userId?.fullName}</strong>
                 </div>
-                <small className="text-muted">
-                  {new Date(idea.createdAt).toLocaleDateString('en-US', {
+                
+              {/* Edit and Delete Buttons */}
+
+              {
+               (userInfo && (
+               (userInfo._id === idea.userId?._id) || 
+               (userInfo.role?.name === 'Admin' || userInfo.role?.name === 'QA Manager')
+              )) && (
+             <div className="mt-3">
+             {/* Edit button - only show to owner */}
+             {userInfo._id === idea.userId?._id && (
+            <Link to={`/editidea/${idea._id}`}>
+            <Button variant="warning" size="sm" className="me-2">
+            <FaEdit />
+           </Button>
+          </Link>
+         )}
+      
+        {/* Delete button - show to owner AND Admin/QA Manager */}
+        <Button
+        variant="danger"
+        size="sm"
+        onClick={() => handleDelete(idea._id, userInfo._id === idea.userId?._id)}
+       >
+        <FaTrash />
+        </Button>
+       </div>
+         )
+        }
+        </div>
+
+              <div className="text-muted mb-3">
+                <strong>Created at:</strong> 
+                {new Date(idea.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
                   })}
-                </small>
               </div>
 
               {/* Idea Title and Description */}

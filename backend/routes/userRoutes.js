@@ -16,13 +16,13 @@ import {
         forgotPassword
         } from "../controllers/userController.js";
 import {protect , roleAccess} from "../middleware/authMiddleware.js";
-
+import logUserActivity from '../middleware/logUserActivity.js';
 const router = express.Router();
 
 router.route('/auth').post(authUser);
 router.route('/resetPassword').post(resetPassword);
 router.route('/forgotPassword').post(forgotPassword);
-router.route('/profile').get(protect ,getUserProfile).put(protect, updateUserProfile);
+router.route('/profile').get(protect, logUserActivity, getUserProfile).put(protect, updateUserProfile);
 router.route('/update/:id/manager').put(protect, roleAccess(['Admin', 'QA Manager' , 'QA Coordinator']), updateUserInfo);
 router.route('/').post(registerUser).get(protect, roleAccess(['Admin']), getUsers);
 router.route('/add').post(protect, roleAccess(['Admin', 'QA Manager', 'QA Coordinator' ]), registerUserForManager);

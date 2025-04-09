@@ -8,10 +8,10 @@ import { createClosureDate ,
 
 const router = express.Router();
 
-router.get('/', protect,roleAccess(['Admin', 'QA Manager' ]), getClosureDates);
+router.get('/', protect,roleAccess(['Admin']), getClosureDates);
 router.get('/latest', protect, getLatestClosureDates);
-router.post('/', protect, roleAccess(['Admin', 'QA Manager' ]),createClosureDate);
-router.put('/:id', protect,roleAccess(['Admin', 'QA Manager' ]), updateClosureDate);
+router.post('/', protect, roleAccess(['Admin']),createClosureDate);
+router.put('/:id', protect,roleAccess(['Admin']), updateClosureDate);
 
 
 export default router;

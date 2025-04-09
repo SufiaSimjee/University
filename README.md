@@ -1,6 +1,9 @@
-## Setup Instructions
+### Live Demo
+https://university-a01q.onrender.com
 
-Follow these steps to set up and run the project:
+## Local Development Setup
+
+Follow these steps to set up and run the project locally:
 
 ### 1. Open the Project in Terminal
 Navigate to the root directory of the project using your terminal.
@@ -19,3 +22,5 @@ To run (npm run server)
 
 ### 5. To run both frontend and backend
 type (npm run dev)
+
+

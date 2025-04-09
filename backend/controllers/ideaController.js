@@ -127,22 +127,21 @@ const getAllIdeas = asyncHandler(async (req, res) => {
     .populate('role')  
     .populate('departments');  
 
-    console.log(user);
+  console.log(user);
 
   if (!user) {
     res.status(404);
     throw new Error('User not found');
   }
   const role = user.role.name;
-  
 
   if (role === 'Admin' || role === 'QA Manager') {
     const ideas = await Idea.find()
-      .select('title description category showAllDepartments createdAt , isAnonymous')
+      .select('title description category showAllDepartments createdAt isAnonymous')
       .populate('category', 'name')
       .populate({
         path: 'userId',
-        select: 'fullName',
+        select: 'fullName isActive',
         populate: {
           path: 'departments',
           select: 'name',
@@ -150,11 +149,51 @@ const getAllIdeas = asyncHandler(async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    return res.status(200).json(ideas);
-  } else {
+    const activeIdeas = ideas.filter(idea => idea.userId.isActive);
 
-  const ideas = await Idea.find()
-    .select('title description category showAllDepartments createdAt , isAnonymous')
+    return res.status(200).json(activeIdeas);
+  } else {
+    const ideas = await Idea.find()
+      .select('title description category showAllDepartments createdAt isAnonymous')
+      .populate('category', 'name')
+      .populate({
+        path: 'userId',
+        select: 'fullName isActive',
+        populate: {
+          path: 'departments',
+          select: 'name',
+        },
+      })
+      .sort({ createdAt: -1 });
+
+    const filteredIdeas = ideas.filter(idea => {
+      if (idea.showAllDepartments) return true;
+
+      if (!idea.userId.departments) return false;
+
+      const isActive = idea.userId.isActive;
+      if (!isActive) return false;
+
+      return idea.userId.departments.some(department =>
+        user.departments.some(userDepartment =>
+          userDepartment._id.toString() === department._id.toString() 
+        )
+      );
+    });
+
+    res.status(200).json(filteredIdeas);
+  }
+});
+
+
+// @desc    Get all ideas of the logged-in user
+// @route   GET /api/ideas/myideas
+// @access  Private
+const getMyIdeas = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const ideas = await Idea.find({ userId }) 
+    .select('title description category showAllDepartments createdAt isAnonymous')
     .populate('category', 'name')
     .populate({
       path: 'userId',
@@ -166,20 +205,7 @@ const getAllIdeas = asyncHandler(async (req, res) => {
     })
     .sort({ createdAt: -1 });
 
-  const filteredIdeas = ideas.filter(idea => {
-    if (idea.showAllDepartments) return true;
-
-    if (!idea.userId.departments) return false;
-
-    return idea.userId.departments.some(department =>
-      user.departments.some(userDepartment =>
-        userDepartment._id.toString() === department._id.toString() 
-      )
-    );
-  });
-
-  res.status(200).json(filteredIdeas);
-}
+  res.status(200).json(ideas);
 });
 
 // @desc    Get popular ideas (top 3 with most upvotes)
@@ -245,7 +271,9 @@ const getPopularIdeas = asyncHandler(async (req, res) => {
   res.status(200).json(ideas);
 });
 
-//
+// @desc    Get most downvoted ideas (top 3 with most downvotes)
+// @route   GET /api/ideas/mostdownvoted
+// @access  Private
 const getMostDownvotedIdeas = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id)
     .populate('role')
@@ -309,26 +337,93 @@ const getMostDownvotedIdeas = asyncHandler(async (req, res) => {
 // @desc    Get idea by ID
 // @route   GET /api/ideas/:id
 // @access  Private
-const getIdeaById = asyncHandler(async (req, res) => {
+// const getIdeaById = asyncHandler(async (req, res) => {
   
+//   const ideaId = req.params.id;
+
+//   const idea = await Idea.findById(ideaId)
+//   .populate({
+//     path: 'userId',
+//     select: 'fullName departments',
+//     populate: {
+//       path: 'departments',
+//       select: 'name', 
+//     },
+//   })
+//     .populate('category', 'name')
+//     .populate('comments.userId', 'fullName');
+
+//   if (!idea) {
+//     res.status(404);
+//     throw new Error('Idea not found');
+//   }
+
+//   const bucket = new GridFSBucket(mongoose.connection.db, {
+//     bucketName: 'uploads',
+//   });
+
+//   const fileUrls = Array.isArray(idea.fileUrls) ? idea.fileUrls : [];
+
+//   const processedFiles = await Promise.all(
+//     fileUrls.map(async (fileId) => {
+//       try {
+//         const fileIdObj = new mongoose.Types.ObjectId(fileId);
+//         const fileDoc = await bucket.find({ _id: fileIdObj }).toArray();
+//         const fileName = fileDoc[0]?.filename || 'Unknown File';
+//         const mimeType = fileDoc[0]?.contentType || 'application/octet-stream';
+
+//         const downloadStream = bucket.openDownloadStream(fileIdObj);
+
+//         let chunks = [];
+//         for await (const chunk of downloadStream) {
+//           chunks.push(chunk);
+//         }
+
+//         const fileBuffer = Buffer.concat(chunks);
+//         const fileBase64 = fileBuffer.toString('base64');
+
+//         return {
+//           fileName: fileName,
+//           mimeType: mimeType,
+//           fileUrl: `data:${mimeType};base64,${fileBase64}`,
+//         };
+//       } catch (error) {
+//         throw new Error('Error processing files');
+//       }
+//     })
+//   );
+
+//   const formattedIdea = {
+//     ...idea.toObject(),
+//     fileUrls: processedFiles.filter((url) => url !== null),
+//   };
+
+//   res.status(200).json(formattedIdea);
+// });
+
+const getIdeaById = asyncHandler(async (req, res) => {
   const ideaId = req.params.id;
 
   const idea = await Idea.findById(ideaId)
-  .populate({
-    path: 'userId',
-    select: 'fullName departments',
-    populate: {
-      path: 'departments',
-      select: 'name', 
-    },
-  })
+    .populate({
+      path: 'userId',
+      select: 'fullName departments',
+      populate: {
+        path: 'departments',
+        select: 'name',
+      },
+    })
     .populate('category', 'name')
-    .populate('comments.userId', 'fullName');
+    .populate('comments.userId', 'fullName isActive'); 
 
   if (!idea) {
     res.status(404);
     throw new Error('Idea not found');
   }
+
+  const filteredComments = idea.comments.filter(
+    (comment) => comment.userId && comment.userId.isActive
+  );
 
   const bucket = new GridFSBucket(mongoose.connection.db, {
     bucketName: 'uploads',
@@ -367,6 +462,7 @@ const getIdeaById = asyncHandler(async (req, res) => {
 
   const formattedIdea = {
     ...idea.toObject(),
+    comments: filteredComments,
     fileUrls: processedFiles.filter((url) => url !== null),
   };
 
@@ -609,6 +705,58 @@ const downVoteIdea = asyncHandler(async (req, res) => {
 });
 
 
+// @desc    Edit an existing idea
+// @route   PUT /api/ideas/editidea/:id
+// @access  Private
+const editIdea = asyncHandler(async (req, res) => {
+  const { title, description, selectedCategories, isAnonymous, showAllDepartments, agreeToTerms } = req.body;
+  const { id } = req.params;
+  const idea = await Idea.findById(id);
+
+  if (!idea) {
+    throw new Error("Idea not found");
+  }
+
+  const fileUrls = [];
+  const bucket = new GridFSBucket(mongoose.connection.db, {
+    bucketName: "uploads",
+  });
+
+  if (req.files && req.files.length > 0) {
+    for (let i = 0; i < req.files.length; i++) {
+      try {
+        const file = req.files[i];
+        const uploadStream = bucket.openUploadStream(file.originalname, {
+          contentType: file.mimetype || "application/octet-stream",
+        });
+        uploadStream.end(file.buffer);
+        fileUrls.push(uploadStream.id);
+      } catch (error) {
+        throw new Error("File upload failed");
+      }
+    }
+  }
+
+  if (title) idea.title = title;
+  if (description) idea.description = description;
+  if (selectedCategories) idea.category = selectedCategories;
+  if (isAnonymous !== undefined) idea.isAnonymous = isAnonymous;
+  if (showAllDepartments !== undefined) idea.showAllDepartments = showAllDepartments;
+  if (agreeToTerms !== undefined) idea.agreeToTerms = agreeToTerms;
+  if (fileUrls.length > 0) idea.fileUrls = fileUrls; 
+
+  const updatedIdea = await idea.save();
+
+  if (!updatedIdea) {
+    throw new Error("Idea could not be updated");
+  }
+
+  res.status(200).json({
+    message: "Idea updated successfully",
+    idea: updatedIdea,
+  });
+});
+
 export {
   createComment,
   createIdea,
@@ -622,5 +770,6 @@ export {
   upVoteIdea,
   getPopularIdeas,
   getMostDownvotedIdeas,
-  
+  getMyIdeas,
+  editIdea
 };

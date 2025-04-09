@@ -13,7 +13,6 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
       providesTags: ['Ideas'],
     }),
 
-    // Get an idea by ID
       // Get a single idea by ID
       getIdeaById: builder.query({
         query: (ideaId) => ({
@@ -117,8 +116,6 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['Ideas'],
     }),
 
-   
-
     // Downvote an idea
     downVoteIdea: builder.mutation({
       query: ({ ideaId, userId }) => ({
@@ -128,10 +125,28 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
       keepUnusedDataFor: 5,
       invalidatesTags: ['Ideas'],
     }),
+    
+    // get all my ideas
+    getMyIdeas: builder.query({
+      query: () => ({
+        url: `${IDEAS_URL}/myideas`,
+        method: 'GET',
+      }),
+      keepUnusedDataFor: 5,
+      providesTags: ['Ideas'],     
+    }),
+    
 
+    updateIdea: builder.mutation({
+      query: ({ ideaId, updatedData }) => ({
+        url: `/api/ideas/editidea/${ideaId}`,
+        method: 'PUT',
+        body: updatedData,
+      }),
+      invalidatesTags: ['Ideas'],
+    }),
     
-    
-  
+
   })
 });
 
@@ -148,5 +163,6 @@ export const {
   useDownVoteIdeaMutation,
   useGetPopularIdeasQuery,
   useGetMostDislikedIdeasQuery,
- 
+  useGetMyIdeasQuery,
+  useUpdateIdeaMutation
 } = ideasApiSlice;

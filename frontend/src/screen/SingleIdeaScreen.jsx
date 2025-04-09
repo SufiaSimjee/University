@@ -7,6 +7,7 @@ import {
   useDownVoteIdeaMutation,
   useUpdateCommentMutation,
   useDeleteCommentMutation,
+  useDeleteIdeaMutation,
 } from "../slices/ideasApiSlice";
 import { Card, Modal, Button } from "react-bootstrap"; 
 import { useSelector } from "react-redux";
@@ -17,7 +18,11 @@ import IdeaHeader from "../components/IdeaHeader";
 import FileDisplay from "../components/FileDisplay";
 import VoteButtons from "../components/VoteButton";
 import CommentSection from "../components/CommentSection";
-import DeleteIdeaButton from "../components/DeleteIdeaButton";
+import {FaTrash , FaEdit} from "react-icons/fa";
+import {Link} from "react-router-dom";
+import {useNavigate } from "react-router-dom";
+import ReportIdeaButton from "../components/ReportIdeaButton";
+import AdminIdeaReportButton from "../components/AdminIdeaReportButton"; 
 
 const SingleIdeaScreen = () => {
   const { ideaId } = useParams();
@@ -35,6 +40,9 @@ const SingleIdeaScreen = () => {
   const [downVoteIdea] = useDownVoteIdeaMutation();
   const [updateComment] = useUpdateCommentMutation(); 
   const [deleteComment] = useDeleteCommentMutation(); 
+  const [deleteIdea] = useDeleteIdeaMutation();
+
+   const navigate = useNavigate();
 
   const handleCommentToggle = () => {
     setShowComments((prev) => !prev);
@@ -122,12 +130,34 @@ const SingleIdeaScreen = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this idea?')) {
+      try {
+        await deleteIdea(id).unwrap();
+        alert('Idea deleted successfully');
+        navigate('/ideas');
+      } catch (err) {
+        alert('Error deleting idea. Please try again.');
+        console.error(err);
+      }
+    }
+  };
+
   if (isLoading) return <Loader />;
   if (error) return <Message variant="danger">{error?.data?.message || error.message}</Message>;
 
   return (
     <div className="container mt-4">
       <h1 className="mb-4">Idea Details</h1>
+
+      {userInfo.role?.name !== 'Admin' && userInfo.role?.name !== 'QA Manager' && (
+       <ReportIdeaButton ideaId={ideaId} />
+      )}
+
+      {userInfo.role?.name === 'Admin' || userInfo.role?.name === 'QA Manager' ? (
+        <AdminIdeaReportButton ideaId={ideaId} />
+      ) : null}
+     
 
       <Card className="mb-3 shadow-sm">
         <Card.Body>
@@ -136,20 +166,47 @@ const SingleIdeaScreen = () => {
             <div>
             <strong>Uploaded by : {idea.isAnonymous ? 'Anonymous' : idea.userId?.fullName}</strong>
             </div>
-            <small className="text-muted">
-              {new Date(idea.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
+               {/* Edit and Delete Buttons */}
+               {
+               (userInfo && (
+               (userInfo._id === idea.userId?._id) || 
+               (userInfo.role?.name === 'Admin' || userInfo.role?.name === 'QA Manager')
+              )) && (
+             <div className="mt-3">
+             {/* Edit button - only show to owner */}
+             {userInfo._id === idea.userId?._id && (
+            <Link to={`/editidea/${idea._id}`}>
+            <Button variant="warning" size="sm" className="me-2">
+            <FaEdit />
+           </Button>
+          </Link>
+         )}
+      
+        {/* Delete button - show to owner AND Admin/QA Manager */}
+        <Button
+        variant="danger"
+        size="sm"
+        onClick={() => handleDelete(idea._id, userInfo._id === idea.userId?._id)}
+       >
+        <FaTrash />
+        </Button>
+       </div>
+         )
+        }
+        </div>
+
+        {/* time */}
+        <div className="text-muted mb-3">
+          <strong>Created at:</strong> 
+            {new Date(idea.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
               })}
-            </small>
-          </div>
-          <div className="d-flex justify-content-end ">
-          <DeleteIdeaButton  ideaId={ideaId}/>
-          
-          </div>
+              </div>
+         
           <IdeaHeader
             title={idea.title}
             description={idea.description}

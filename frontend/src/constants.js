@@ -12,5 +12,7 @@ export const  IDEAS_URL = '/api/ideas';
 export const STATISTICS_URL = '/api/reports';
 export const  FILE_DOWNLOAD_URL = '/api/download';
 export const CLOUSER_DATE_URL = '/api/closuredates';
+export const IDEA_REPORT_URL = '/api/ideareports';
+
 
 

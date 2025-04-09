@@ -44,6 +44,8 @@ import AcademicYearUpdateScreen from './screen/AdminAndQA/AcademicYearUpdateScre
 import AcademicYearScreen from './screen/AdminAndQA/AcademicYearScreen.jsx'
 import AcademicYearCreateScreen from './screen/AdminAndQA/AcademicYearCreateScreen.jsx'
 import ProfileScreen from './screen/ProfileScreen.jsx'
+import MyIdeaScreen from './screen/MyIdeaScreen.jsx'
+import EditIdeaScreen from './screen/EditIdeaScreen.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -53,6 +55,7 @@ const router = createBrowserRouter(
         <Route path="*" element={<NotFoundScreen />} />
         <Route path='/termsAndConditions' element={<TermsAndConditionsScreen/>}/>
         <Route path='/forgotPassword' element={<ForgotPasswordScreen/>}/>
+     
 
         {/* Admin and QA Manager Routes */}
         <Route element={<AdminOrQAManagerRoute/>}> 
@@ -98,6 +101,8 @@ const router = createBrowserRouter(
         <Route path='/ideas/popular' element={<PopularIdeaScreen/>}/>
         <Route path='/ideas/dislike' element={<DislikeIdeaScreen/>}/>
         <Route path='/ideas/:ideaId' element={<SingleIdeaScreen/>}/>
+        <Route path='/myidea' element={<MyIdeaScreen/>}/>
+        <Route path='/editidea/:id' element={<EditIdeaScreen/>}/> 
       </Route>
 
     </Route>

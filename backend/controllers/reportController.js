@@ -4,6 +4,7 @@ import User from '../models/userModel.js';
 import Role from '../models/roleModel.js';
 import Department from '../models/departmentModel.js';
 import Category from '../models/categoryModel.js';
+import UserActivity from "../models/userActivityModel.js";
 import mongoose from 'mongoose';
 
 // @desc Get Statistics Report
@@ -349,6 +350,95 @@ const getDepartmentUserCount = async (req, res) => {
   }
 };
 
+// @desc Get Most Active User Based on Submitted Ideas, Upvotes, Downvotes, and Comments
+// @route GET /api/reports/getMostActiveUser
+// @access Admin, QA Manager
+const getMostActiveUser = asyncHandler(async (req, res) => {
+  try {
+    const mostActiveUser = await Idea.aggregate([
+      {
+        $group: {
+          _id: "$userId", 
+          totalIdeas: { $sum: 1 }, 
+          totalUpvotes: { $sum: { $cond: [{ $ifNull: ["$upVotes", []] }, { $size: "$upVotes" }, 0] } }, 
+          totalDownvotes: { $sum: { $cond: [{ $ifNull: ["$downVotes", []] }, { $size: "$downVotes" }, 0] } }, 
+          totalComments: { $sum: { $cond: [{ $ifNull: ["$comments", []] }, { $size: "$comments" }, 0] } },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user_info",
+        },
+      },
+      {
+        $unwind: "$user_info", 
+      },
+      {
+        $project: {
+          fullName: "$user_info.fullName", 
+          totalIdeas: 1, 
+          totalUpvotes: 1, 
+          totalDownvotes: 1, 
+          totalComments: 1, 
+        },
+      },
+      {
+        $sort: {
+          totalIdeas: -1, 
+        },
+      },
+      {
+        $limit: 1, 
+      },
+    ]);
+
+    res.status(200).json( mostActiveUser|| "Didn't find most active user" );
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// @desc Get User Activity Statistics
+// @route GET /api/reports/userActivityStats
+// @access Private Admin
+const getUserActivityStats = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const getMostUsed = async (field) => {
+    const result = await UserActivity.aggregate([
+      { $match: { user: userId } },
+      { $group: { _id: `$${field}`, count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 1 },
+    ]);
+
+    if (result.length > 0) {
+      if (field === "page") {
+        const rawPage = result[0]._id || "";
+        const parts = rawPage.split("/").filter(Boolean); 
+        return parts.length > 0 ? parts[parts.length - 1] : "unknown";
+      }
+
+      return result[0]._id;
+    }
+
+    return 0;
+  };
+
+  const mostUsedBrowser = await getMostUsed("browser");
+  const mostUsedDevice = await getMostUsed("deviceType");
+  const mostVisitedPage = await getMostUsed("page");
+
+  res.status(200).json({
+    mostUsedBrowser,
+    mostUsedDevice,
+    mostVisitedPage,
+  });
+});
+
 export { getIdeasByDepartment , 
          getPercentageOfIdeasByDepartment ,
          getContributorsByDepartment,
@@ -359,5 +449,7 @@ export { getIdeasByDepartment ,
          getNonAnonymousIdeasCount,
          getAnonymousIdeasCount,
          getUserIdeasCount,
-         getDepartmentUserCount
+         getDepartmentUserCount,
+         getMostActiveUser,
+         getUserActivityStats,
         };

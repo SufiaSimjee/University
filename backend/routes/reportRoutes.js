@@ -10,7 +10,9 @@ import { getIdeasByDepartment ,
         getNonAnonymousIdeasCount,
         getAnonymousIdeasCount,
         getUserIdeasCount,
-        getDepartmentUserCount
+        getDepartmentUserCount,
+        getMostActiveUser,
+        getUserActivityStats
         } from '../controllers/reportController.js';
 
 const router = express.Router();
@@ -28,5 +30,8 @@ router.route('/getanonymousideascount').get(protect,roleAccess(['Admin', 'QA Man
 router.route('/getuserideascount').get(protect,  getUserIdeasCount);
 router.route('/getdepartmentusercount').get(protect,roleAccess(['QA Coordinator']),  getDepartmentUserCount);
 
+// for admin only
+router.route('/getmostactiveuser').get(protect,roleAccess(['Admin']),  getMostActiveUser);
+router.route('/useractivitystats').get(protect,roleAccess(['Admin']),  getUserActivityStats);
 
 export default router;
