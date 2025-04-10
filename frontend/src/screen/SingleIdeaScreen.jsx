@@ -23,6 +23,7 @@ import {Link} from "react-router-dom";
 import {useNavigate } from "react-router-dom";
 import ReportIdeaButton from "../components/ReportIdeaButton";
 import AdminIdeaReportButton from "../components/AdminIdeaReportButton"; 
+import DeleteIdeaFilesButton from "../components/DeleteIdeaFilesButton";
 
 const SingleIdeaScreen = () => {
   const { ideaId } = useParams();
@@ -214,6 +215,18 @@ const SingleIdeaScreen = () => {
             showAllDepartments={idea.showAllDepartments}
             departments={idea.userId.departments}
           />
+
+           {idea.fileUrls &&
+           idea.fileUrls.length > 0 &&
+           userInfo &&
+           (
+           userInfo._id === idea.userId?._id ||
+           userInfo.role?.name === 'Admin' ||
+           userInfo.role?.name === 'QA Manager'
+           ) && (
+        <DeleteIdeaFilesButton ideaId={idea._id} />
+        )}
+
 
           {/* File Display */}
           <FileDisplay fileUrls={idea.fileUrls} />

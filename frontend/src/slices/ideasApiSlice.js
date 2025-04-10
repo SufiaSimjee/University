@@ -146,6 +146,14 @@ export const ideasApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['Ideas'],
     }),
     
+    // delete idea files by id
+    deleteIdeaFilesById: builder.mutation({
+      query: (id) => ({
+        url: `/api/ideas/delete/idea/files/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Ideas'],
+    }),
 
   })
 });
@@ -164,5 +172,6 @@ export const {
   useGetPopularIdeasQuery,
   useGetMostDislikedIdeasQuery,
   useGetMyIdeasQuery,
-  useUpdateIdeaMutation
+  useUpdateIdeaMutation,
+  useDeleteIdeaFilesByIdMutation,
 } = ideasApiSlice;

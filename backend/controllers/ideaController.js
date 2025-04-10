@@ -337,70 +337,6 @@ const getMostDownvotedIdeas = asyncHandler(async (req, res) => {
 // @desc    Get idea by ID
 // @route   GET /api/ideas/:id
 // @access  Private
-// const getIdeaById = asyncHandler(async (req, res) => {
-  
-//   const ideaId = req.params.id;
-
-//   const idea = await Idea.findById(ideaId)
-//   .populate({
-//     path: 'userId',
-//     select: 'fullName departments',
-//     populate: {
-//       path: 'departments',
-//       select: 'name', 
-//     },
-//   })
-//     .populate('category', 'name')
-//     .populate('comments.userId', 'fullName');
-
-//   if (!idea) {
-//     res.status(404);
-//     throw new Error('Idea not found');
-//   }
-
-//   const bucket = new GridFSBucket(mongoose.connection.db, {
-//     bucketName: 'uploads',
-//   });
-
-//   const fileUrls = Array.isArray(idea.fileUrls) ? idea.fileUrls : [];
-
-//   const processedFiles = await Promise.all(
-//     fileUrls.map(async (fileId) => {
-//       try {
-//         const fileIdObj = new mongoose.Types.ObjectId(fileId);
-//         const fileDoc = await bucket.find({ _id: fileIdObj }).toArray();
-//         const fileName = fileDoc[0]?.filename || 'Unknown File';
-//         const mimeType = fileDoc[0]?.contentType || 'application/octet-stream';
-
-//         const downloadStream = bucket.openDownloadStream(fileIdObj);
-
-//         let chunks = [];
-//         for await (const chunk of downloadStream) {
-//           chunks.push(chunk);
-//         }
-
-//         const fileBuffer = Buffer.concat(chunks);
-//         const fileBase64 = fileBuffer.toString('base64');
-
-//         return {
-//           fileName: fileName,
-//           mimeType: mimeType,
-//           fileUrl: `data:${mimeType};base64,${fileBase64}`,
-//         };
-//       } catch (error) {
-//         throw new Error('Error processing files');
-//       }
-//     })
-//   );
-
-//   const formattedIdea = {
-//     ...idea.toObject(),
-//     fileUrls: processedFiles.filter((url) => url !== null),
-//   };
-
-//   res.status(200).json(formattedIdea);
-// });
-
 const getIdeaById = asyncHandler(async (req, res) => {
   const ideaId = req.params.id;
 
@@ -757,6 +693,39 @@ const editIdea = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Delete all files associated with an idea
+// @route   DELETE /api/ideas/delete/idea/files/:id
+// @access  Private
+const deleteIdeaFilesById = asyncHandler(async (req, res) => {
+  const ideaId = req.params.id;
+
+  const idea = await Idea.findById(ideaId);
+  if (!idea) {
+    res.status(404);
+    throw new Error('Idea not found');
+  }
+
+  const db = mongoose.connection.db;
+  const bucket = new GridFSBucket(db, {
+    bucketName: 'uploads',
+  });
+
+  const fileUrls = idea.fileUrls || [];
+
+  for (const fileId of fileUrls) {
+    try {
+      await bucket.delete(new mongoose.Types.ObjectId(fileId));
+    } catch (error) {
+      console.error(`Error deleting file with ID ${fileId}:`, error.message);
+    }
+  }
+
+  idea.fileUrls = [];
+  await idea.save();
+
+  res.status(200).json({ message: 'All files for the idea have been deleted successfully.' });
+});
+
 export {
   createComment,
   createIdea,
@@ -771,5 +740,6 @@ export {
   getPopularIdeas,
   getMostDownvotedIdeas,
   getMyIdeas,
-  editIdea
+  editIdea,
+  deleteIdeaFilesById,
 };

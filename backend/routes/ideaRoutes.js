@@ -16,7 +16,8 @@ import {
   getPopularIdeas,
   getMostDownvotedIdeas,
   getMyIdeas,
-  editIdea
+  editIdea,
+  deleteIdeaFilesById
 } from '../controllers/ideaController.js';
 
 const router = express.Router();
@@ -46,6 +47,8 @@ router
 
 router.route('/upVotes/:ideaId/:userId').post(protect ,upVoteIdea);
 router.route('/downVotes/:ideaId/:userId').post(protect ,downVoteIdea);
+
+router.route('/delete/idea/files/:id').delete(protect , deleteIdeaFilesById);
 
 
 export default router;
