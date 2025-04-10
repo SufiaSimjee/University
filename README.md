@@ -12,7 +12,7 @@ Navigate to the root directory of the project using your terminal.
 In the root directory, run the following command to install the required backend dependencies: 
 npm install
 
-### 3. Install Frontend Frontend Dependencies
+### 3. Install Frontend Dependencies
 Navigate to the frontend folder (type cd frontend) 
 To install dependencies (npm install)
 
