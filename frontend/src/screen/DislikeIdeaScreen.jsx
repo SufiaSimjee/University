@@ -17,12 +17,12 @@ const DislikeIdeaScreen = () => {
   }
 
   if (error) {
-    return <Message>Error fetching popular ideas. Please try again later.</Message>;
+    return <Message>Error fetching dislike ideas. Please try again later.</Message>;
   }
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">Most Popular Ideas</h1>
+      <h1 className="mb-4">Most Dislike Ideas</h1>
 
       {/* New Idea Button */}
       <div className="d-flex justify-content-start mb-4">
@@ -100,7 +100,7 @@ const DislikeIdeaScreen = () => {
           </Card>
         ))
       ) : (
-        <div className="text-center text-muted">No popular ideas available</div>
+        <div className="text-center text-muted">No dislike ideas available</div>
       )}
     </div>
   );
