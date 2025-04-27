@@ -88,8 +88,8 @@ const Header = () => {
                 </NavDropdown>
               )}
 
-              {/* QA Manager and Admin */}
-              {userInfo && (userInfo.role?.name === 'Admin' || userInfo.role?.name === 'QA Manager') && (
+              {/*  Admin */}
+              {userInfo && (userInfo.role?.name === 'Admin') && (
                 <NavDropdown title='AcademicYear' id='academicYear'>
                   <NavDropdown.Item as={Link} to='/academicYear/history'>
                     History
