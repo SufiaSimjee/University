@@ -66,9 +66,7 @@ const router = createBrowserRouter(
           <Route path='/addDepartment' element={<AddDepartment/>}/>
           <Route path='/editDepartment/:id' element={<EditDepartment />} />
           <Route path='/users' element={<GetAllUserScreen/>}/>
-          <Route path='/academicYear' element={<AcademicYearUpdateScreen/>}/>
-          <Route path='/academicYear/History' element={<AcademicYearScreen/>}/>
-          <Route path='/academicYear/create' element={<AcademicYearCreateScreen/>}/>
+    
       </Route>
 
       {/* Admin , QA Manager , QA Coordinator Routes */}
@@ -80,6 +78,9 @@ const router = createBrowserRouter(
       <Route element={<AdminRoute/>}>
           <Route path='/admin/register' element={<AdminRegisterScreen/>}/>
           <Route path='/admin/users' element={<GetAllUserScreen/>}/>
+           <Route path='/academicYear' element={<AcademicYearUpdateScreen/>}/>
+          <Route path='/academicYear/History' element={<AcademicYearScreen/>}/>
+          <Route path='/academicYear/create' element={<AcademicYearCreateScreen/>}/>
       </Route>
 
       {/* QA Manager Routes */}
